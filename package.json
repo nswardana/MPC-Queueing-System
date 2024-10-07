@@ -10,6 +10,7 @@
     "express": "^4.16.4",
     "helmet": "^3.15.0",
     "morgan": "^1.9.1",
+    "mysql2": "^3.11.3",
     "nodemon": "^1.18.9",
     "path": "^0.12.7",
     "pg": "^7.7.1",
@@ -24,10 +25,10 @@
     "sequelize": "^4.42.0",
     "sequelize-cli": "^5.4.0",
     "socket.io": "^2.2.0",
-    "socket.io-client": "^2.2.0"
+    "socket.io-client": "^3.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
