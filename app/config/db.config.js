@@ -1,7 +1,7 @@
 module.exports = {
-    HOST: "0.0.0.0",
-    USER: "odoo_user",
-    PASSWORD: "abuya313",
+    HOST: "localhost",
+    USER: "postgres",
+    PASSWORD: "postgres",
     DB: "Armonia",
     dialect: "postgres",
     pool: {
@@ -11,4 +11,3 @@ module.exports = {
       idle: 10000
     }
   };
-  
