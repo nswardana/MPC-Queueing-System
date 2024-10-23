@@ -2,7 +2,7 @@ module.exports = {
     HOST: "localhost",
     USER: "odoo_user",
     PASSWORD: "abuya313",
-    DB: "armonia2",
+    DB: "Armonia",
     dialect: "postgres",
     pool: {
       max: 5,
