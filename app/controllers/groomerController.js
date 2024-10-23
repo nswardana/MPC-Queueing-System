@@ -1,21 +1,16 @@
 'use strict';
 const db = require('../models/index.js');
-const Doctor = db.Doctor;
+const Groomer = db.Groomer;
 const Ticket = db.Ticket;
 const Queue = db.Queue;
 const Patient = db.Patient;
 const io = require('../io/io').getIo();
 /*
 const home = io.of('/').on('connection', socket=>{
-  //console.log("doctor : connected from Home page.");
- // console.log("New client connected");
-});
-
-const queue = io.of('/queue').on('connection', socket=>{
-  console.log("Connected from Queue page.");
+  //console.log("Connected from Home page.");
 });
 */
-exports.addDoctor = async function(req, res){
+exports.addGroomer = async function(req, res){
   let { name, onDuty } = req.body;
   let result = {
     success: false,
@@ -23,12 +18,12 @@ exports.addDoctor = async function(req, res){
   };
 
   try{
-    let newDoctor = await Doctor.create({
+    let newGroomer = await Groomer.create({
       name,
       onDuty
     });
     result.success = true;
-    result.message = "Successfully added a new doctor.";
+    result.message = "Successfully added a new groomer.";
 
   } catch(e){
     result.success = false;
@@ -39,52 +34,52 @@ exports.addDoctor = async function(req, res){
 
 exports.toggleDuty = async function(req, res){
 
-  let { doctorId } = req.body;
+  let { groomerId } = req.body;
   let result = {
     success: false,
     message: null
   };
   
   try {
-    let doctor = await Doctor.findByPk(doctorId);
-    if(doctor){
-      await doctor.update({
-        onDuty: !doctor.onDuty
+    let groomer = await Groomer.findByPk(groomerId);
+    if(groomer){
+      await groomer.update({
+        onDuty: !groomer.onDuty
       });
       result.success = true;
-      result.message = "Successfull changed doctor on-duty status.";
+      result.message = "Successfull changed groomer on-duty status.";
     } else {
       result.success = false;
-      result.message = "Doctor not found.";
+      result.message = "Groomer not found.";
     }
 
   } catch(e){
     result.success = false;
     result.message = e.toString();
   }
- // queue.emit("doctorToggleDuty");
+  //queue.emit("doctorToggleDuty");
   res.send(result);
 }
 
-exports.getAllDoctors = async function(req, res){
-  let doctors = await Doctor.findAll({
+exports.getAllGroomers = async function(req, res){
+  let groomers = await Groomer.findAll({
     attributes: ['id','name','onDuty'],
     order: [['id']]
   });
 
-  const result = doctors.map(doctor=>{
+  const result = groomers.map(groomer=>{
     return {
-      doctorId: doctor.id,
-      name: doctor.name,
-      onDuty: doctor.onDuty
+      groomerId: groomer.id,
+      name: groomer.name,
+      onDuty: groomer.onDuty
     }
   });
 
   res.send(result);
 }
 
-exports.getOnDutyDoctors = async function(req, res){
-  let doctors = await Doctor.findAll({
+exports.getOnDutyGroomers = async function(req, res){
+  let groomers = await Groomer.findAll({
     attributes: ['id','name'],
     where: {
       onDuty: true
@@ -115,27 +110,28 @@ exports.getOnDutyDoctors = async function(req, res){
     }]
   });
 
-  const result = doctors.map(doctor =>({
-    doctorId: doctor.id,
-    doctorName: doctor.name,
-    ticketId: doctor.Tickets.length > 0 ? doctor.Tickets[0].id : null,
-    ticketNumber: doctor.Tickets.length > 0 ? doctor.Tickets[0].ticketNumber : null,
-    patientFirstName: doctor.Tickets.length > 0 ? doctor.Tickets[0].patient.name: null,
-    patientLastName: doctor.Tickets.length > 0 ? doctor.Tickets[0].patient.name: null
+  const result = groomers.map(groomer =>({
+    groomerId: groomer.id,
+    groomerName: groomer.name,
+    ticketId: groomer.Tickets.length > 0 ? groomer.Tickets[0].id : null,
+    ticketNumber: groomer.Tickets.length > 0 ? groomer.Tickets[0].ticketNumber : null,
+    patientFirstName: groomer.Tickets.length > 0 ? groomer.Tickets[0].patient.name: null,
+    patientLastName: groomer.Tickets.length > 0 ? groomer.Tickets[0].patient.name: null
   }));
   res.send(result);
 }
 
 exports.nextPatient = async function(req, res){
-
     let result = {
       success: false,
       message: null
     };
 
     try {
-      let { doctorId } = req.body;
-      let doctor = await Doctor.findByPk(doctorId, {
+      console.log("req.body",req.body);           
+
+      let { groomerId } = req.body;
+      let groomer = await Groomer.findByPk(groomerId, {
         include: [{
           model: Ticket,
           attributes: ['id'],
@@ -153,27 +149,32 @@ exports.nextPatient = async function(req, res){
           }]
         }]
       });
-      console.log("doctor");      
-      console.log(doctor);
 
+      console.log("Data groomer");
+      console.log("groomerId",groomerId);           
+      console.log(groomer);
+
+        //jika ada tiket yang diambil, tiket itu di ubah menjadi update
+      console.log("jika ada tiket yang diambil, tiket itu di ubah menjadi update");      
       
-      //jika ada tiket yang diambil, tiket itu di ubah menjadi update
-      if(doctor.Tickets.length>0){
-        let ticket = await Ticket.findByPk(doctor.Tickets[0].id);
+      if(groomer.Tickets.length>0){
+        let ticket = await Ticket.findByPk(groomer.Tickets[0].id);
         await ticket.update({
           isActive: false
         });
         result.message = "Successfully closed current ticket.";
       }
 
-     //jika tidak ada tiket, cari tiket berikutnya yang layanannya
+      console.log("jika tidak ada tiket, cari tiket berikutnya yang layanannya");      
+
+      //jika tidak ada tiket, cari tiket berikutnya yang layanannya
      // {'layanan'} 
       let nextTicket = await Ticket.findAll({
         attributes: ['id'],
         where: {
-          layanan:"Rawatjalan",
+          layanan:"Grooming",
           isActive: true,
-          doctorId: null
+          groomerId: null
         },
         include: [{
           model: Queue,
@@ -186,15 +187,19 @@ exports.nextPatient = async function(req, res){
         order: [['ticketNumber', 'ASC']]
       });
 
-      
+      console.log("nextTicket[0]");      
+      console.log(nextTicket[0]);
+
       if(nextTicket[0]){
-        //masukan tiket no 1 ke dokter yang berjaga
-        await doctor.addTicket(nextTicket[0]);
+        await groomer.addTicket(nextTicket[0]);
+
+        console.log("Setelah di update");      
+        console.log(groomer);
+        
         result.message = "Successfully closed current ticket and moved to the next patient.";
       }
       result.success = true;
       home.emit('next');
-    
 
     } catch(e){
       result.success = false;
@@ -202,5 +207,4 @@ exports.nextPatient = async function(req, res){
     }
 
     res.send(result);
-    
 }

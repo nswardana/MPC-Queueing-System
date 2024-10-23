@@ -1,19 +1,18 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import {config} from '../Config/config';
-import NewDoctor from './NewDoctor';
-import AllDoctors from './AllDoctors';
+import NewGroomer from './NewGroomer';
+import AllGroomers from './AllGroomers';
 import io from "socket.io-client";
 
-class Doctors extends Component{
+class Groomers extends Component{
 
 	constructor(){
 		super();
 		this.URL = config.URL;
 		this.socket=io.connect(this.URL);
-
 		this.state={
-			doctors:[]
+			groomers:[]
 		};
 	}
 
@@ -22,31 +21,31 @@ class Doctors extends Component{
 	}
 
 	async refresh(){
-		let doctors = (await axios.get(`${this.URL}/doctors/getalldoctors`)).data;
+		let groomers = (await axios.get(`${this.URL}/groomers/getallgroomers`)).data;
 		this.setState({
-			doctors
+			groomers
 		});
 	}
 
-	toggleDuty = async (doctorId) => {
+	toggleDuty = async (groomerId) => {
 		try{
-			let result = (await axios.post(`${this.URL}/doctors/toggleduty`,{
-				doctorId
+			let result = (await axios.post(`${this.URL}/groomers/toggleduty`,{
+				groomerId
 			})).data;
 
 			if(result.success){
-				let doctors = [...this.state.doctors];
-				for(let i=0; i<doctors.length; i++){
-					if(doctors[i].doctorId===doctorId){
-						let toggleStatus = doctors[i].onDuty ? false : true;
-						doctors[i].onDuty = toggleStatus;
+				let groomers = [...this.state.groomers];
+				for(let i=0; i<groomers.length; i++){
+					if(groomers[i].groomerId===groomerId){
+						let toggleStatus = groomers[i].onDuty ? false : true;
+						groomers[i].onDuty = toggleStatus;
 						break;
 					}
 				}
 				this.setState({
-					doctors
+					groomers
 				});
-				this.socket.emit("doctorToggleDuty",{doctorId});
+				this.socket.emit("doctorToggleDuty",{groomerId});
 			}
 		} catch(e){
 			console.log(e);
@@ -59,11 +58,11 @@ class Doctors extends Component{
 				<div className="container">
 					<div className="row">
 						<div className="col-4 card">
-							<NewDoctor refresh={()=>this.refresh()}/>
+							<NewGroomer refresh={()=>this.refresh()}/>
 						</div>
 						<div className="col-8 card">
-							<AllDoctors
-								doctors={this.state.doctors}
+							<AllGroomers
+								groomers={this.state.groomers}
 								toggleDuty={this.toggleDuty}
 								refresh={()=>this.refresh()}
 							/>
@@ -76,4 +75,4 @@ class Doctors extends Component{
 
 }
 
-export default Doctors;
+export default Groomers;

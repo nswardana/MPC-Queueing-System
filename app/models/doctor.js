@@ -1,8 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   const Doctor = sequelize.define('Doctor', {
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
+    name: DataTypes.STRING,
     onDuty: DataTypes.BOOLEAN
   }, {});
   Doctor.associate = function(models) {

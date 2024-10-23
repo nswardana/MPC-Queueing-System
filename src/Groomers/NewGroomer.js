@@ -2,12 +2,15 @@ import React, { Component } from 'react';
 import { config } from '../Config/config.js';
 import Select from 'react-select'
 import axios from 'axios';
+import io from "socket.io-client";
 
-class NewDoctor extends Component{
 
+class NewGroomer extends Component{
 	constructor(){
 		super();
 		this.URL = config.URL;
+		this.socket=io.connect(this.URL);
+
 		this.initialState =  {
 			name: '',
       		onDuty: true,
@@ -32,17 +35,16 @@ class NewDoctor extends Component{
 	}
 
 	async refresh(){
-		let doctorclinics = (await axios.get(`${this.URL}/api/doctorclinic`)).data;
-		var doctors = [];
+		let groomerclinics = (await axios.get(`${this.URL}/api/groomerclinic`)).data;
+		var groomers = [];
 		var i ;
-		for(i=0; i < doctorclinics.length; i++){
-			var option= {value: doctorclinics[i].name, label: doctorclinics[i].name };
-			doctors.push(option);
+		for(i=0; i < groomerclinics.length; i++){
+			var option= {value: groomerclinics[i].name, label: groomerclinics[i].name };
+			groomers.push(option);
 		}
-		//doctors=options;
-		this.setState({doctors});
-
+		this.setState({groomers});
 	}
+
 	async submit(){
 		this.setState({
 		  submitDisabled: true,
@@ -50,12 +52,14 @@ class NewDoctor extends Component{
 	    });
 		
 		let {name, onDuty } = this.state;
-	    await axios.post(`${this.URL}/doctors/adddoctor`, {
+	    await axios.post(`${this.URL}/groomers/addgroomer`, {
 	      name,
 	      onDuty
 	    }).then(response => {
 	    	this.setState(this.initialState);
 	    	this.props.refresh();
+			this.socket.emit("doctorToggleDuty",{name});
+
 	    }).catch(function(error){
 	    	console.log(error);
 	    });
@@ -72,8 +76,8 @@ class NewDoctor extends Component{
 			<React.Fragment>
 				<div className="container card" style={{marginTop: '20px', marginBottom: '20px'}}>
 					<div className="form-group">
-						<label htmlFor="doctor" className="text-danger">Doctor</label>
-						<Select options={this.state.doctors} onChange={(e) => this.updateName(e.value)} />
+						<label htmlFor="groomer" className="text-danger">Groomer</label>
+						<Select options={this.state.groomers} onChange={(e) => this.updateName(e.value)} />
 					</div>
 					
 					<div className="form-group">
@@ -90,4 +94,4 @@ class NewDoctor extends Component{
 	}
 }
 
-export default NewDoctor;
+export default NewGroomer;

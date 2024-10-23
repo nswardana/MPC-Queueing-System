@@ -56,7 +56,7 @@ class QueueControl extends Component{
     if(this.state.hasOpenQueue){
       button = <button type="button" onClick={()=>this.closeActiveQueue()} className="btn btn-danger">Close Queue</button>;
     } else {
-      button = <button type="button" onClick={()=>this.openNewQueue()} className="btn btn-danger">Open New Queue</button>;
+      button = <button type="button" onClick={()=>this.openNewQueue()} className="btn btn-danger">Open Queue</button>;
     }
     return button;
   }
@@ -64,7 +64,7 @@ class QueueControl extends Component{
   render(){
     return(
       <React.Fragment>
-        <div className="card" style={{marginTop: '20px', marginBottom: '20px'}}>
+        <div className="card" style={{marginTop: '20px', marginBottom: '20px', backgroundColor: "rgba(0, 0, 0, 0.1)"}}>
           {!this.state.hasOpenQueue &&
           <div className="alert alert-danger">
             No queue is currently open. Click <em>Open New Queue</em> to start.

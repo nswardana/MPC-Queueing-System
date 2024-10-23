@@ -1,13 +1,14 @@
 import React, {Component} from 'react';
 import axios from 'axios';
 import {config} from '../Config/config';
-import socketIOClient from "socket.io-client";
+import io from "socket.io-client";
 
 class OnDutyDoctors extends Component{
 
   constructor(){
     super();
     this.URL = config.URL;
+    this.socket=io.connect(this.URL);
     this.state = {
       onDutyDoctors: []
     };
@@ -15,8 +16,7 @@ class OnDutyDoctors extends Component{
 
   componentDidMount(){
   		this.refresh();
-      const socket = socketIOClient(`${this.URL}/queue`);
-      socket.on("doctorToggleDuty", ()=>{
+      this.socket.on("data_doctorToggleDuty", (data)=>{
         this.refresh();
       });
   }
@@ -45,12 +45,13 @@ class OnDutyDoctors extends Component{
     }
   }
 
-  async nextPatient(doctorId){
+  async nextPatientDoctor(doctorId){
     await axios.post(`${this.URL}/doctors/nextpatient`, {
       doctorId
     });
     this.props.refreshTickets();
     this.refresh();
+    this.socket.emit("next_patient",{doctorId});
   }
 
   render(){
@@ -58,16 +59,19 @@ class OnDutyDoctors extends Component{
       <div className="row" style={{marginTop:'20px', marginBottom:'20px', marginLeft: '5px', marginRight: '5px'}}>
         {this.state.onDutyDoctors.length===0 && 'No on duty doctors.'}
         {this.state.onDutyDoctors.length>0 && this.state.onDutyDoctors.map(onDutyDoctor => (
-          <div key={onDutyDoctor.doctorId} className="col-sm-4 card text-center">
+          <div key={onDutyDoctor.doctorId} className="col-sm-3 card text-center text-bg-info"  style={{marginTop:'5px', marginLeft:'5px',padding:'0px',backgroundColor: "rgba(0, 102, 51, 0.3)"}}>
             <div className="card-body">
-              <h1>{this.getTicket(onDutyDoctor)}</h1>
+              <h5>{this.getTicket(onDutyDoctor)}</h5>
               <div className="card-text">
-                <p><strong className="text-danger">Doctor:</strong> {onDutyDoctor.doctorFirstName +" "+ onDutyDoctor.doctorLastName}</p>
-                <p>{this.getPatient(onDutyDoctor)}</p>
+               <span> <strong className="text-danger">Dokter:</strong> {onDutyDoctor.doctorName}</span>
+                {this.getPatient(onDutyDoctor)}
               </div>
-              <button className="btn btn-sm btn-danger"
-                onClick={()=>this.nextPatient(onDutyDoctor.doctorId)}
-              >Next Patient</button>
+                 </div>
+
+            <div className="card-footer" >
+                <button className="btn btn-sm btn-danger"
+                onClick={()=>this.nextPatientDoctor(onDutyDoctor.doctorId)}
+              >Pasien Berikutnya</button>
             </div>
           </div>
         ))}

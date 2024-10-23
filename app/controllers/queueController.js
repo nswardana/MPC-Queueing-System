@@ -1,15 +1,20 @@
 'use strict';
+const groomer = require('../models/groomer.js');
 const db = require('../models/index.js');
 const Patient = db.Patient;
 const Queue = db.Queue;
 const Ticket = db.Ticket;
 const Doctor = db.Doctor;
+const Groomer = db.Groomer;
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
+
 const io = require('../io/io').getIo();
+/*
 const home = io.of('/').on('connection', socket=>{
-  console.log("Connected from Home page.");
+  //console.log("Connected from Home page.");
 });
+*/
 
 exports.getActiveQueue = async function(req, res){
   let queue = await Queue.findAll({
@@ -42,26 +47,76 @@ exports.getTickets = async function(req, res){
       {
         model: Patient,
         as: 'patient',
-        attributes: ['firstName', 'lastName', 'gender', 'birthday', 'caseDescription']
+        attributes: ['name', 'email', 'mobile', 'rekam_medis', 'gender','layanan','catatan']
       },
       {
         model: Doctor,
         as: 'doctor',
-        attributes: ['firstName', 'lastName'],
+        attributes: ['name'],
+        required: false
+      },
+      {
+        model: Groomer,
+        as: 'groomer',
+        attributes: ['name'],
         required: false
       }
     ]
   });
-  const result = tickets.map(ticket=>({
+
+  const result = tickets.map(ticket=>(
+  {
     ticketNo: ticket.ticketNumber,
     queueId: ticket.queueId,
-    firstName: ticket.patient.firstName,
-    lastName: ticket.patient.lastName,
+    name: ticket.patient.name,
+    email: ticket.patient.email,
     gender: ticket.patient.gender,
-    birthday: ticket.patient.birthday,
-    caseDescription: ticket.patient.caseDescription,
-    doctor: ticket.doctor ? "Dr. "+ticket.doctor.firstName+" "+ticket.doctor.lastName : "No attending physician yet."
+    catatan: ticket.patient.catatan,
+    layanan: ticket.patient.layanan,
+    doctor: ticket.doctor || ticket.groomer  ? " "+ticket?.doctor?.name+" /"+ticket?.groomer?.name+"": "No attending physician yet."
+    
   }));
+
+  res.send(result);
+}
+
+
+exports.getTicketsWithGroomers = async function(req, res){
+  let ticketsWithGroomers = await Ticket.findAll({
+    where: {
+      isActive: true,
+      groomerId: {
+        [Op.ne] : null
+      }
+    },
+    order: [['updatedAt','DESC']],
+    include: [{
+      model: Queue,
+      as: 'queue',
+      attributes: ['id'],
+      where: {
+        isActive: true
+      }
+    },
+    {
+      model: Patient,
+      as: 'patient',
+      attributes: ['name', 'email']
+    },
+    {
+      model: Groomer,
+      as: 'groomer',
+      attributes: ['name']
+    }
+    ]
+  });
+  const result = ticketsWithGroomers.map(ticket => {
+    return { ticketId: ticket.id,
+      ticketNumber: ticket.ticketNumber,
+      patient: ticket.patient.name,
+      groomer: ticket.groomer.name
+    };
+  });
   res.send(result);
 }
 
@@ -85,20 +140,20 @@ exports.getTicketsWithDoctors = async function(req, res){
     {
       model: Patient,
       as: 'patient',
-      attributes: ['firstName', 'lastName']
+      attributes: ['name', 'email']
     },
     {
       model: Doctor,
       as: 'doctor',
-      attributes: ['firstName','lastName']
+      attributes: ['name']
     }
     ]
   });
   const result = ticketsWithDoctors.map(ticket => {
     return { ticketId: ticket.id,
       ticketNumber: ticket.ticketNumber,
-      patient: ticket.patient.firstName +" "+ticket.patient.lastName,
-      doctor: ticket.doctor.firstName +" "+ticket.doctor.lastName
+      patient: ticket.patient.name,
+      doctor: ticket.doctor.name
     };
   });
   res.send(result);

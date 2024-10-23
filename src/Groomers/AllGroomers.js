@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-class AllDoctors extends Component {
+class AllGroomers extends Component {
 
   constructor(props){
     super(props);
@@ -17,12 +17,12 @@ class AllDoctors extends Component {
           </tr>
         </thead>
         <tbody>
-          {this.props.doctors.length===0 && <tr><td colSpan="6">No doctors. Add a doctor to start.</td></tr> }
-          {this.props.doctors.length>0 && this.props.doctors.map(doctor => (
-            <tr key={doctor.doctorId}>
-              <td>{doctor.name}</td>
+          {this.props.groomers.length===0 && <tr><td colSpan="6">No groomers. Add a groomer to start.</td></tr> }
+          {this.props.groomers.length>0 && this.props.groomers.map(groomer => (
+            <tr key={groomer.groomerId}>
+              <td>{groomer.name}</td>
               <td width="100" align="center">
-                <input type="checkbox" onChange={() => this.props.toggleDuty(doctor.doctorId)} checked={doctor.onDuty}/>
+                <input type="checkbox" onChange={() => this.props.toggleDuty(groomer.groomerId)} checked={groomer.onDuty}/>
               </td>
             </tr>
           ))}
@@ -33,4 +33,4 @@ class AllDoctors extends Component {
   }
 }
 
-export default AllDoctors;
+export default AllGroomers;

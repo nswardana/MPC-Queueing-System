@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import {config} from '../Config/config';
 import axios from 'axios';
-import socketIOClient from "socket.io-client";
+import io from "socket.io-client";
 
 class DisplayQueue extends Component {
 
 	constructor(){
 		super();
 		this.URL = config.URL;
+		this.socket=io.connect(this.URL);
 		this.state={
 			ticketsWithDoctors: []
 		};
@@ -22,11 +23,10 @@ class DisplayQueue extends Component {
 
 	componentDidMount(){
 		this.refreshQueue();
-		const socket = socketIOClient(this.URL);
-		socket.on("next", () => {
+		this.socket.on("data_next_patient", () => {
 			this.refreshQueue();
 		});
-		socket.on("closeQueue", ()=>{
+		this.socket.on("closeQueue", ()=>{
 			this.refreshQueue();
 		});
 	}
@@ -43,6 +43,7 @@ class DisplayQueue extends Component {
 		let latestTicketWithDoctor = this.getLatestTicketWithDoctor();
 		return(
 			<div className="container">
+				{/*}
 				<div className="row" style={{marginTop: '20px'}}>
 					{this.state.ticketsWithDoctors.length===0 && "No patient is currently being attended by doctors."}
 					{latestTicketWithDoctor && (
@@ -57,10 +58,11 @@ class DisplayQueue extends Component {
 						</div>
 					)}
 				</div>
+				{*/}
 				<div className="row" style={{marginBottom:'20px'}}>
 				{latestTicketWithDoctor &&
 					this.state.ticketsWithDoctors.map(ticketWithDoctor => (
-							<div key={ticketWithDoctor.ticketNumber} className="col-sm-4 card text-center">
+							<div key={ticketWithDoctor.ticketNumber} className="col-sm-3 card text-center" style={{marginTop:'20px',marginLeft:'5px',padding:'0px'}}>
 								<div className="card-body">
 									<h1 className="text-danger">{ticketWithDoctor.ticketNumber.toString().padStart(4, "0")}</h1>
 								</div>
