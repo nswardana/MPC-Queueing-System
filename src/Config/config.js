@@ -1,4 +1,4 @@
-var URL = "http://localhost:1604";
+var URL = "http://51.79.188.202:4002";
 export const config = {
 	URL
 };
