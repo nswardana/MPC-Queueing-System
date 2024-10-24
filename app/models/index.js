@@ -15,7 +15,6 @@ if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {
   console.log("model dbConfig");
-
   //sequelize = new Sequelize(config.database, config.username, config.password, config);
   sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,

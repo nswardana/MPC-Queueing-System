@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
 const { Server } = require("socket.io"); // Import Socket.IO Server class
 const io = new Server(server, {
     cors: {
-      origin: ["http://localhost:3001",'http://localhost:3000','http://51.79.188.202:4003'], // Allow requests from this origin and my frontend port = 5173
+      origin: '*', //origin: ["http://localhost:4003",'http://localhost:4001','http://51.79.188.202:4003'], // Allow requests from this origin and my frontend port = 5173
       methods: ["GET", "POST"], // Allow these HTTP methods
     },
 });
@@ -66,11 +66,8 @@ io.on("connection", (socket) => {
       // Emit the received message data to all connected clients
       io.emit("data_doctorToggleDuty", data);
     });
-
-
     
 });
-
 
 app.use(morgan('dev'));
 app.use(bodyParser.json());
@@ -116,7 +113,6 @@ require("./routes/tutorial.routes")(app);
 require("./routes/patient.routes")(app);
 require("./routes/doctor.routes")(app);
 require("./routes/groomer.routes")(app);
-
 
 // Handle React routing, return all requests to React app
 app.get("*", (req, res) => {
