@@ -33,8 +33,8 @@ io.on("connection", (socket) => {
 // Initialize a new instance of Socket.IO by passing the HTTP server
 const { Server } = require("socket.io"); // Import Socket.IO Server class
 const io = new Server(server, {
-    pingTimeout: 600000,
-    pingInterval: 300000,
+    pingTimeout: 6000,
+    pingInterval: 3000,
     cors: {
       origin: '*', //origin: ["http://localhost:4003",'http://localhost:4001','http://51.79.188.202:4003'], // Allow requests from this origin and my frontend port = 5173
       methods: ["GET", "POST"], // Allow these HTTP methods
