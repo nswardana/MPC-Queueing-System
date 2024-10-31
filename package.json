@@ -24,6 +24,7 @@
     "react-scripts": "2.1.1",
     "react-select": "^5.8.1",
     "react-thermal-printer": "^0.18.1",
+    "react-toastify": "^10.0.6",
     "reactstrap": "^7.0.2",
     "sequelize": "^6.32.0",
     "sequelize-cli": "^5.4.0",

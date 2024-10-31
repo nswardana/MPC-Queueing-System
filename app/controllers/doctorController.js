@@ -130,7 +130,8 @@ exports.nextPatient = async function(req, res){
 
     let result = {
       success: false,
-      message: null
+      message: null,
+      data:{}
     };
 
     try {
@@ -190,6 +191,7 @@ exports.nextPatient = async function(req, res){
       if(nextTicket[0]){
         //masukan tiket no 1 ke dokter yang berjaga
         await doctor.addTicket(nextTicket[0]);
+        result.data    = nextTicket[0];
         result.message = "Successfully closed current ticket and moved to the next patient.";
       }
       result.success = true;

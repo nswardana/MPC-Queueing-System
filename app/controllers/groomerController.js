@@ -195,7 +195,7 @@ exports.nextPatient = async function(req, res){
 
         console.log("Setelah di update");      
         console.log(groomer);
-        
+        result.data    = nextTicket[0];
         result.message = "Successfully closed current ticket and moved to the next patient.";
       }
       result.success = true;

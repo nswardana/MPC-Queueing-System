@@ -46,13 +46,21 @@ class OnDutyGroomers extends Component{
   }
 
   async nextPatientGroomer(groomerId){
+    /*
     await axios.post(`${this.URL}/groomers/nextpatient`, {
       groomerId
     });
     this.props.refreshTickets();
     this.refresh();
-
     this.socket.emit("next_patient",{groomerId});
+    */
+    
+    let dataNext = (await axios.post(`${this.URL}/groomers/nextpatient`, {groomerId})).data;
+    this.props.refreshTickets();
+    this.refresh();
+    console.log("dataNext",dataNext);
+    this.socket.emit("next_patient",dataNext.data);
+
   }
 
   render(){
