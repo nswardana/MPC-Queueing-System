@@ -52,8 +52,8 @@ class OnDutyDoctors extends Component{
     });
     */
     let dataNext = (await axios.post(`${this.URL}/doctors/nextpatient`, {doctorId})).data;
-    this.props.refreshTickets();
     this.refresh();
+    this.props.refreshTickets();
     console.log("nextPatientDoctor",dataNext);
     this.socket.emit("next_patient",dataNext.data);
   }
