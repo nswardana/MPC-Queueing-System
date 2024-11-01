@@ -170,7 +170,7 @@ exports.nextPatient = async function(req, res){
       //jika tidak ada tiket, cari tiket berikutnya yang layanannya
      // {'layanan'} 
       let nextTicket = await Ticket.findAll({
-        attributes: ['id'],
+        attributes: ['id','ticketNumber'],
         where: {
           layanan:"Grooming",
           isActive: true,
@@ -187,14 +187,8 @@ exports.nextPatient = async function(req, res){
         order: [['ticketNumber', 'ASC']]
       });
 
-      console.log("nextTicket[0]");      
-      console.log(nextTicket[0]);
-
       if(nextTicket[0]){
         await groomer.addTicket(nextTicket[0]);
-
-        console.log("Setelah di update");      
-        console.log(groomer);
         result.data    = nextTicket[0];
         result.message = "Successfully closed current ticket and moved to the next patient.";
       }

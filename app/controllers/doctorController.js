@@ -170,7 +170,7 @@ exports.nextPatient = async function(req, res){
      //jika tidak ada tiket, cari tiket berikutnya yang layanannya
      // {'layanan'} 
       let nextTicket = await Ticket.findAll({
-        attributes: ['id'],
+        attributes: ['id','ticketNumber'],
         where: {
           layanan:"Rawatjalan",
           isActive: true,

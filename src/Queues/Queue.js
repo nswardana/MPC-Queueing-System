@@ -24,6 +24,7 @@ class Queue extends Component{
 		console.log('componentDidMount');
 		console.log(this.socket);
 		this.socket.on("new_data_patient", (data) => {
+			console.log("new_data_patient"); // Log the received message data to the console
 			console.log(data); // Log the received message data to the console
 			this.refreshTickets();
 		});

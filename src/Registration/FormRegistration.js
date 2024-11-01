@@ -21,7 +21,16 @@ class FormRegistration extends Component{
 		};
 		this.state = this.initialState;
 		this.updateTanggal = this.updateTanggal.bind(this);
+		this._isMounted = false; // Flag untuk mengecek status kompon
 	}
+
+	componentDidMount() {
+        this._isMounted = true;
+     }
+
+	 componentWillUnmount() {
+        this._isMounted = false; // Set flag ke false saat komponen di-unmount
+    }
 
 
 	updateLayanan(value){

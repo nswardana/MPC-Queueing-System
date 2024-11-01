@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import {config} from '../Config/config';
 import io from "socket.io-client";
+import ReactLoading from 'react-loading';
 
 class OnDutyGroomers extends Component{
 
@@ -10,7 +11,8 @@ class OnDutyGroomers extends Component{
     this.URL = config.URL;
     this.socket=io.connect(this.URL);
     this.state = {
-        onDutyGroomers: []
+        onDutyGroomers: [],
+        isLoading: false
     };
   }
 
@@ -45,23 +47,44 @@ class OnDutyGroomers extends Component{
     }
   }
 
-  async nextPatientGroomer(groomerId){
+
+   async nextPatientGroomer(groomerId){
     /*
-    await axios.post(`${this.URL}/groomers/nextpatient`, {
-      groomerId
-    });
-    this.props.refreshTickets();
+   
+    let dataNext = (await axios.post(`${this.URL}/doctors/nextpatient`, {doctorId})).data;
     this.refresh();
-    this.socket.emit("next_patient",{groomerId});
-    */
-    
-    let dataNext = (await axios.post(`${this.URL}/groomers/nextpatient`, {groomerId})).data;
     this.props.refreshTickets();
-    this.refresh();
-    console.log("dataNext",dataNext);
+    console.log("nextPatientDoctor",dataNext);
     this.socket.emit("next_patient",dataNext.data);
+  */
+             this.setState({
+                    isLoading: true
+                });
+
+
+            await axios.post(`${this.URL}/groomers/nextpatient`, {groomerId})
+            .then((result) => {
+
+                this.setState({
+                    isLoading: false
+                });
+
+                this.refresh();
+                this.props.refreshTickets();
+                console.log("nextPatientGroomer",result);
+                this.socket.emit("next_patient",result.data.data);
+
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log(error.responderEnd);
+                }
+            });
 
   }
+
+
+
 
   render(){
     return (
@@ -78,9 +101,11 @@ class OnDutyGroomers extends Component{
                  </div>
 
             <div className="card-footer" >
-                <button className="btn btn-sm btn-primary"
+                { this.state.isLoading ?<ReactLoading type={"bars"} color={"#000"} height={'20%'} width={'20%'} />: <button className="btn btn-sm btn-danger"
                 onClick={()=>this.nextPatientGroomer(onDutyGroomer.groomerId)}
-              >Pasien Berikutnya</button>
+              >Pasien Berikutnya</button> }
+                
+
             </div>
           </div>
         ))}

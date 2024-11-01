@@ -2,25 +2,37 @@ import React, {Component} from 'react';
 import axios from 'axios';
 import {config} from '../Config/config';
 import io from "socket.io-client";
+import ReactLoading from 'react-loading';
 
 class OnDutyDoctors extends Component{
+
+  _isMounted = false;
 
   constructor(){
     super();
     this.URL = config.URL;
     this.socket=io.connect(this.URL);
     this.state = {
-      onDutyDoctors: []
+      onDutyDoctors: [],
+      isLoading: false
     };
+
+
   }
 
   componentDidMount(){
+      this._isMounted = true;
+
   		this.refresh();
       this.socket.on("data_doctorToggleDuty", (data)=>{
         this.refresh();
       });
   }
 
+ componentWillUnmount() {
+    this._isMounted = false;
+  }
+  
   async refresh(){
     let onDutyDoctors = (await axios.get(`${this.URL}/doctors/getondutydoctors`)).data;
     this.setState({
@@ -47,19 +59,44 @@ class OnDutyDoctors extends Component{
 
   async nextPatientDoctor(doctorId){
     /*
-    await axios.post(`${this.URL}/doctors/nextpatient`, {
-      doctorId
-    });
-    */
+   
     let dataNext = (await axios.post(`${this.URL}/doctors/nextpatient`, {doctorId})).data;
     this.refresh();
     this.props.refreshTickets();
     console.log("nextPatientDoctor",dataNext);
     this.socket.emit("next_patient",dataNext.data);
+  */
+     this.setState({
+                    isLoading: true
+                });
+
+
+            await axios.post(`${this.URL}/doctors/nextpatient`, {doctorId})
+            .then((result) => {
+
+                this.setState({
+                    isLoading: false
+                });
+
+                this.refresh();
+                this.props.refreshTickets();
+                console.log("nextPatientDoctor",result);
+                this.socket.emit("next_patient",result.data.data);
+
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.log(error.responderEnd);
+                }
+            });
+
   }
 
+
+
   render(){
-    return (
+
+   return (
       <div className="row" style={{marginTop:'20px', marginBottom:'20px', marginLeft: '5px', marginRight: '5px'}}>
         {this.state.onDutyDoctors.length===0 && 'No on duty doctors.'}
         {this.state.onDutyDoctors.length>0 && this.state.onDutyDoctors.map(onDutyDoctor => (
@@ -72,10 +109,11 @@ class OnDutyDoctors extends Component{
               </div>
                  </div>
 
-            <div className="card-footer" >
-                <button className="btn btn-sm btn-danger"
+             <div className="card-footer" >
+                { this.state.isLoading ?<ReactLoading type={"bars"} color={"#000"} height={'20%'} width={'20%'} />: <button className="btn btn-sm btn-danger"
                 onClick={()=>this.nextPatientDoctor(onDutyDoctor.doctorId)}
-              >Pasien Berikutnya</button>
+              >Pasien Berikutnya</button> }
+                
             </div>
           </div>
         ))}
