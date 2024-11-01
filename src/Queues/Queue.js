@@ -34,6 +34,12 @@ class Queue extends Component{
 		
 	}
 
+	componentDidUnmount()
+	{
+		 return () => this.socket.off('data_next_patient');
+
+	}
+
 	async refreshTickets(){
 		let tickets = (await axios.get(`${this.URL}/queues/gettickets`)).data;
 		this.setState({
@@ -64,8 +70,8 @@ class Queue extends Component{
 						</div>
 					</div>
 					<div className="col-10 card" style={{marginLeft:'0px'}}>
-						<OnDutyDoctors refreshTickets={() => this.refreshTickets()}/>
-						<OnDutyGroomers refreshTickets={() => this.refreshTickets()}/>
+						<OnDutyDoctors socket={this.socket} refreshTickets={() => this.refreshTickets()}/>
+						<OnDutyGroomers socket={this.socket} refreshTickets={() => this.refreshTickets()}/>
 					</div>
 				</div>
 				<div className="row">

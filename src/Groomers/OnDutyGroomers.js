@@ -9,7 +9,7 @@ class OnDutyGroomers extends Component{
   constructor(){
     super();
     this.URL = config.URL;
-    this.socket=io.connect(this.URL);
+    //this.socket=io.connect(this.URL);
     this.state = {
         onDutyGroomers: [],
         isLoading: false
@@ -18,7 +18,7 @@ class OnDutyGroomers extends Component{
 
   componentDidMount(){
     this.refresh();
-    this.socket.on("data_doctorToggleDuty", (data)=>{
+    this.props.socket.on("data_doctorToggleDuty", (data)=>{
       this.refresh();
     });
   }
@@ -72,7 +72,7 @@ class OnDutyGroomers extends Component{
                 this.refresh();
                 this.props.refreshTickets();
                 console.log("nextPatientGroomer",result);
-                this.socket.emit("next_patient",result.data.data);
+                this.props.socket.emit("next_patient",result.data.data);
 
             })
             .catch(error => {

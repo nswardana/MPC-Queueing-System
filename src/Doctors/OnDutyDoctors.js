@@ -11,7 +11,8 @@ class OnDutyDoctors extends Component{
   constructor(){
     super();
     this.URL = config.URL;
-    this.socket=io.connect(this.URL);
+    //this.socket=io.connect(this.URL);
+    //this.socket=this.props.socket;
     this.state = {
       onDutyDoctors: [],
       isLoading: false
@@ -24,7 +25,7 @@ class OnDutyDoctors extends Component{
       this._isMounted = true;
 
   		this.refresh();
-      this.socket.on("data_doctorToggleDuty", (data)=>{
+      this.props.socket.on("data_doctorToggleDuty", (data)=>{
         this.refresh();
       });
   }
@@ -81,7 +82,7 @@ class OnDutyDoctors extends Component{
                 this.refresh();
                 this.props.refreshTickets();
                 console.log("nextPatientDoctor",result);
-                this.socket.emit("next_patient",result.data.data);
+                this.props.socket.emit("next_patient",result.data.data);
 
             })
             .catch(error => {
