@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../Patient/search.css";
 
 
+
 class Registration extends Component{
 	constructor(){
 		super();

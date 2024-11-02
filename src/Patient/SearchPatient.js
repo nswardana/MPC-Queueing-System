@@ -5,6 +5,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "./search.css";
 
+import ReactLoading from 'react-loading';
+
+
 class SearchPatient extends Component{
 	constructor(){
 		super();
@@ -12,7 +15,9 @@ class SearchPatient extends Component{
 		this.initialState =  {
 			no_hp: '',
             errorMessages: [],
-            patients:[]
+            patients:[],
+            isLoading: false
+
 		};
 		this.state = this.initialState;
        
@@ -46,12 +51,14 @@ class SearchPatient extends Component{
 	async submit(){
 		this.setState({
 		  submitDisabled: true,
-	      resetDisabled: true
+	      resetDisabled: true,
+	      isLoading:true
 	    });
 		let {no_hp} = this.state;
 
 	    await axios.get(`${this.URL}/api/patientclinic`, { params: { mobile: no_hp } }).then(response => {
 			this.handleResult(response.data);
+			this.setState({ isLoading:false});
 	    }).catch(function(error){
 	    	console.log(error);
 	    });
@@ -88,8 +95,10 @@ class SearchPatient extends Component{
 									this.submit()
 								}
 							  }}/>
-                        <button type="button" className="custom-search-botton" onClick={() => this.submit() }
-								disabled={this.state.submitDisabled} >Search</button>  
+                       
+						{ this.state.isLoading ?<ReactLoading type={"bars"} color={"#000"} height={'10%'} width={'10%'} />:  <button type="button" className="custom-search-botton" onClick={() => this.submit() }
+								disabled={this.state.submitDisabled} >Search</button>  }
+
                     </div>
 					
 				</div>

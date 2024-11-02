@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useHistory,withRouter } from "react-router-dom";
 import io from "socket.io-client";
+import ReactLoading from 'react-loading';
 
 class FormRegistration extends Component{
 	constructor(props){
@@ -18,6 +19,7 @@ class FormRegistration extends Component{
 			submitDisabled: false,
 			resetDisabled: false,
 			errorMessages: [],
+			isLoading: false
 		};
 		this.state = this.initialState;
 		this.updateTanggal = this.updateTanggal.bind(this);
@@ -71,7 +73,8 @@ class FormRegistration extends Component{
 		let errorMessages = [];
 		this.setState({
 		  submitDisabled: true,
-	      resetDisabled: true
+	      resetDisabled: true,
+	       isLoading:true
 	    });
 		
 		let {catatan, tanggal, layanan } = this.state;
@@ -81,6 +84,7 @@ class FormRegistration extends Component{
 	    }).then(response => {
 			console.log(response);
 	    	this.setState(this.initialState);
+	    	this.setState({ isLoading:false});
 			if(response.data.success)
 			{
 				this.socket.emit("new_patient",this.props.patient);
@@ -92,6 +96,8 @@ class FormRegistration extends Component{
 				errorMessages.push(response.data.message);
 				this.setState({errorMessages});
 			}
+
+
 
 	    }).catch(function(error){
 	    	console.log(error);
@@ -184,13 +190,16 @@ class FormRegistration extends Component{
 						>
 						</textarea>
 					</div>
+
 					<div className="form-group">
+						{ this.state.isLoading ?<ReactLoading type={"bars"} color={"#000"} height={'10%'} width={'10%'} />: 
 							<button type="button" className="btn btn-danger"
 								onClick={() => this.submit() }
 								disabled={this.state.submitDisabled}
 							>
 							SIMPAN</button>
-							
+							 }
+								
 					</div>
 				</div>
 
