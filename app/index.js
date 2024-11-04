@@ -63,6 +63,12 @@ io.on("connection", (socket) => {
       io.emit("data_next_patient", data);
     });
 
+    socket.on("recall", (data) => {
+      console.log("recall ", data); // Log the received message data
+      // Emit the received message data to all connected clients
+      io.emit("data_recall", data);
+    });
+
     socket.on("doctorToggleDuty", (data) => {
       console.log("doctorToggleDuty ", data); // Log the received message data
       // Emit the received message data to all connected clients
@@ -89,6 +95,7 @@ let patientController = require('./controllers/patientController');
 let queueController = require('./controllers/queueController');
 let doctorController = require('./controllers/doctorController');
 let groomerController = require('./controllers/groomerController');
+let messageController = require('./controllers/messageController');
 
 app.post("/patients/create", patientController.create);
 app.get("/queues/gettickets", queueController.getTickets);
@@ -110,6 +117,9 @@ app.get("/groomers/getallgroomers", groomerController.getAllGroomers);
 app.post("/groomers/toggleduty", groomerController.toggleDuty);
 app.get("/groomers/getondutygroomers", groomerController.getOnDutyGroomers);
 app.post("/groomers/nextpatient", groomerController.nextPatient);
+
+app.get("/message/sendwa", messageController.sendWa);
+
 
 require("./routes/tutorial.routes")(app);
 require("./routes/patient.routes")(app);

@@ -19,5 +19,10 @@
     "database": "database_production",
     "host": "127.0.0.1",
     "dialect": "mysql"
-  }
+  },
+  "watzap": {
+    "api_key": "EEUDILXK3RUHSV76",
+    "number_key": "9dTTQgeOm7rjrcKg"
+   }
+
 }

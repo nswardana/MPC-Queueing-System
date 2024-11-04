@@ -3,30 +3,9 @@ const db = require('../models/index.js');
 const Patient = db.Patient;
 const Queue = db.Queue;
 const Ticket = db.Ticket;
+const Message = db.Message;
+
 const io = require('../io/io').getIo();
-
-/*
-const home = io.of('/').on('connection', socket=>{
-	
-	console.log("Patient : User connected ", socket.id); // Log the socket ID of the connected user
-	socket.on("send_message", (data) => {
-        console.log("Message Received ", data); // Log the received message data
-        // Emit the received message data to all connected clients
-        home.emit("receive_message", data);
-    });
-
-	socket.on('change color', (color) => {
-		console.log(color);
-		home.emit('change color', color)
-	})
-
-
-});
-
-const queue = io.of('/queue').on('connection', socket=>{
-  console.log("Connected from Queue page.");
-});
-*/
 exports.create = async function(req, res){
 	let {name, email, mobile, gender,rekam_medis, layanan,street,tanggal,catatan} = req.body;
 	let activeQueue = await Queue.findAll({
@@ -66,6 +45,16 @@ exports.create = async function(req, res){
 			await ticket.setQueue(activeQueue);
 			result.success = true;
 			result.message = "Patient successfully created.";
+
+			//send message
+			var no_hp=mobile;
+			var message="Kepada Yth Bpk/Ibu "+name+",\n\nTerima kasih atas kunjungan Anda di Armonia Pet Care. \n\nNo Antrian :  *"+ticketNumber+"* \nLayanan : "+layanan+" \n\nTerima Kasih sudah menunggu \n\nARMONIA PET CARE";
+			var issent=false;
+			let saveMassage = await Message.create({
+				no_hp,
+				message,
+				issent
+			  });
 
 		}
 		catch(e){

@@ -93,6 +93,11 @@ class OnDutyDoctors extends Component{
 
   }
 
+  recall(ticketNumber){
+    console.log(ticketNumber);
+    this.props.socket.emit("recall",ticketNumber);
+  }
+
 
 
   render(){
@@ -111,10 +116,12 @@ class OnDutyDoctors extends Component{
                  </div>
 
              <div className="card-footer" >
-                { this.state.isLoading ?<ReactLoading type={"bars"} color={"#000"} height={'20%'} width={'20%'} />: <button className="btn btn-sm btn-danger"
+              { this.state.isLoading ?<ReactLoading type={"bars"} color={"#000"} height={'20%'} width={'20%'} />: <><button className="btn btn-sm btn-danger"
                 onClick={()=>this.nextPatientDoctor(onDutyDoctor.doctorId)}
-              >Pasien Berikutnya</button> }
-                
+              >Berikutnya</button></>}
+              { onDutyDoctor.ticketNumber? <button className="btn btn-sm btn-warning"
+              onClick={()=>this.recall(onDutyDoctor.ticketNumber)}
+              >Recall</button>: <></>}         
             </div>
           </div>
         ))}
