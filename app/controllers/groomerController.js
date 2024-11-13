@@ -6,7 +6,7 @@ const Queue = db.Queue;
 const Patient = db.Patient;
 const io = require('../io/io').getIo();
 const home = io.of('/').on('connection', socket=>{
-  console.log("Connected from GROOMER.");
+  //console.log("Connected from GROOMER.");
 });
 
 exports.addGroomer = async function(req, res){
