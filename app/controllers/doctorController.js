@@ -5,12 +5,11 @@ const Ticket = db.Ticket;
 const Queue = db.Queue;
 const Patient = db.Patient;
 const io = require('../io/io').getIo();
-/*
-const home = io.of('/').on('connection', socket=>{
-  //console.log("doctor : connected from Home page.");
- // console.log("New client connected");
-});
 
+const home = io.of('/').on('connection', socket=>{
+   console.log("Connected from DOCKTOR.");
+});
+/*
 const queue = io.of('/queue').on('connection', socket=>{
   console.log("Connected from Queue page.");
 });
@@ -195,8 +194,10 @@ exports.nextPatient = async function(req, res){
         result.message = "Successfully closed current ticket and moved to the next patient.";
       }
       result.success = true;
-      home.emit('next');
-    
+      //home.emit('next');
+
+      home.emit('next_patient_doctor', {data :result.data });
+
 
     } catch(e){
       result.success = false;

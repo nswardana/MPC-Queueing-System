@@ -72,7 +72,9 @@ class OnDutyGroomers extends Component{
                 this.refresh();
                 this.props.refreshTickets();
                 console.log("nextPatientGroomer",result);
-                this.props.socket.emit("next_patient",result.data.data);
+                //this.props.socket.emit("next_patient",result.data.data);
+
+
 
             })
             .catch(error => {

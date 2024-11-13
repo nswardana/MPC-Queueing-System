@@ -5,11 +5,10 @@ const Ticket = db.Ticket;
 const Queue = db.Queue;
 const Patient = db.Patient;
 const io = require('../io/io').getIo();
-/*
 const home = io.of('/').on('connection', socket=>{
-  //console.log("Connected from Home page.");
+  console.log("Connected from GROOMER.");
 });
-*/
+
 exports.addGroomer = async function(req, res){
   let { name, onDuty } = req.body;
   let result = {
@@ -155,7 +154,7 @@ exports.nextPatient = async function(req, res){
       console.log(groomer);
 
         //jika ada tiket yang diambil, tiket itu di ubah menjadi update
-      console.log("jika ada tiket yang diambil, tiket itu di ubah menjadi update");      
+      console.log(">>>> jika ada tiket yang diambil, tiket itu di ubah menjadi update");      
       
       if(groomer.Tickets.length>0){
         let ticket = await Ticket.findByPk(groomer.Tickets[0].id);
@@ -165,7 +164,7 @@ exports.nextPatient = async function(req, res){
         result.message = "Successfully closed current ticket.";
       }
 
-      console.log("jika tidak ada tiket, cari tiket berikutnya yang layanannya");      
+      console.log(">>>> jika tidak ada tiket, cari tiket berikutnya yang layanannya");      
 
       //jika tidak ada tiket, cari tiket berikutnya yang layanannya
      // {'layanan'} 
@@ -193,12 +192,16 @@ exports.nextPatient = async function(req, res){
         result.message = "Successfully closed current ticket and moved to the next patient.";
       }
       result.success = true;
-      home.emit('next');
+        //home.emit('next');
+      console.log(">>>> next_patient_grooming emit");      
+      home.emit('next_patient_grooming', {data :result.data });
 
     } catch(e){
       result.success = false;
       result.message = e.toString();
     }
+
+    
 
     res.send(result);
 }
