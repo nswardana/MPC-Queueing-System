@@ -25,13 +25,14 @@ class OnDutyDoctors extends Component{
       this._isMounted = true;
 
   		this.refresh();
-      this.props.socket.on("data_doctorToggleDuty", (data)=>{
+      this.props.socket.on("doctorToggleDuty", (data)=>{
         this.refresh();
       });
   }
 
  componentWillUnmount() {
     this._isMounted = false;
+    return () => this.socket.off('doctorToggleDuty');
   }
   
   async refresh(){

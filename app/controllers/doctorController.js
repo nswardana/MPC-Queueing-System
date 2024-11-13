@@ -61,7 +61,7 @@ exports.toggleDuty = async function(req, res){
     result.success = false;
     result.message = e.toString();
   }
- // queue.emit("doctorToggleDuty");
+  home.emit("doctorToggleDuty");
   res.send(result);
 }
 

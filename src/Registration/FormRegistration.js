@@ -90,7 +90,7 @@ class FormRegistration extends Component{
 	    	this.setState({ isLoading:false});
 			if(response.data.success)
 			{
-				this.socket.emit("new_patient",this.props.patient);
+				//this.socket.emit("new_patient",this.props.patient);
 				this.props.history.push({
 					pathname: `/registration/print`,
 					state: {

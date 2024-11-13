@@ -46,7 +46,7 @@ class Doctors extends Component{
 				this.setState({
 					doctors
 				});
-				this.socket.emit("doctorToggleDuty",{doctorId});
+				//this.socket.emit("doctorToggleDuty",{doctorId});
 			}
 		} catch(e){
 			console.log(e);

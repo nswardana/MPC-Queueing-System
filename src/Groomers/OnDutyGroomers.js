@@ -18,10 +18,16 @@ class OnDutyGroomers extends Component{
 
   componentDidMount(){
     this.refresh();
-    this.props.socket.on("data_doctorToggleDuty", (data)=>{
+    this.props.socket.on("groomerToggleDuty", (data)=>{
       this.refresh();
     });
   }
+
+  componentDidUnmount()
+	{
+		 return () => this.socket.off('groomerToggleDuty');
+
+	}
 
   async refresh(){
     let onDutyGroomers = (await axios.get(`${this.URL}/groomers/getondutygroomers`)).data;
@@ -68,13 +74,9 @@ class OnDutyGroomers extends Component{
                 this.setState({
                     isLoading: false
                 });
-
                 this.refresh();
                 this.props.refreshTickets();
                 console.log("nextPatientGroomer",result);
-                //this.props.socket.emit("next_patient",result.data.data);
-
-
 
             })
             .catch(error => {

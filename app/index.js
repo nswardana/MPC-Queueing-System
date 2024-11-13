@@ -55,6 +55,7 @@ io.on("connection", (socket) => {
         io.emit("receive_message", data);
     });
 
+    /*
     socket.on("new_patient", (data) => {
       console.log("new_patient ", data); // Log the received message data
       // Emit the received message data to all connected clients
@@ -66,7 +67,8 @@ io.on("connection", (socket) => {
       // Emit the received message data to all connected clients
       io.emit("data_next_patient", data);
     });
-
+    */
+   
     socket.on("recall", (data) => {
       console.log("recall ", data); // Log the received message data
       // Emit the received message data to all connected clients

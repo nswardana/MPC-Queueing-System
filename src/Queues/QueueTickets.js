@@ -25,11 +25,12 @@ class QueueTickets extends Component{
 							{this.props.tickets.length > 0 && this.props.tickets.map(ticket=>(
                 			<tr key={ticket.ticketNo}>
 								<td style={{width: '100px'}}>{ticket.ticketNo.toString().padStart(4, "0")}</td>
-                				<td style={{width: '200px'}}>{ticket.name+", "+ticket.mobile}</td>
+                				<td style={{width: '200px'}}>{ticket.name}</td>
 								<td style={{width: '75px'}}>{ticket.gender}</td>
 								<td style={{width: '50px'}}><span className="badge badge-primary">{ticket.layanan}</span></td>
 								<td style={{width: '300px'}}>{ticket.catatan}</td>
-								<td style={{width: '100px'}}>{ticket.doctor}</td>
+								<td style={{width: '100px'}}>{ticket.doctor!=="-" && <span className="badge badge-success">{ticket.doctor}</span> }</td>
+
                 			</tr>
 							))}
             </tbody>

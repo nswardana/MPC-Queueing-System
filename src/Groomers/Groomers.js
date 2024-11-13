@@ -45,7 +45,7 @@ class Groomers extends Component{
 				this.setState({
 					groomers
 				});
-				this.socket.emit("doctorToggleDuty",{groomerId});
+				//this.socket.emit("groomerToggleDuty",{groomerId});
 			}
 		} catch(e){
 			console.log(e);

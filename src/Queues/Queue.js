@@ -23,20 +23,31 @@ class Queue extends Component{
 	componentDidMount(){
 		console.log('componentDidMount');
 		console.log(this.socket);
-		this.socket.on("new_data_patient", (data) => {
-			console.log("new_data_patient"); // Log the received message data to the console
+		
+		this.socket.on("new_patient", (data) => {
+			console.log("new_patient"); // Log the received message data to the console
 			console.log(data); // Log the received message data to the console
 			this.refreshTickets();
 		});
-		this.socket.on("next", () => {
+
+		this.socket.on("next_patient_grooming", (data) => {
+			console.log("next_patient_grooming"); // Log the received message data to the console
+			console.log(data); // Log the received message data to the console
 			this.refreshTickets();
 		});
-		
+
+		this.socket.on("next_patient_doctor", (data) => {
+			console.log("next_patient_doctor"); // Log the received message data to the console
+			console.log(data); // Log the received message data to the console
+			this.refreshTickets();
+		});
+
+
 	}
 
 	componentDidUnmount()
 	{
-		 return () => this.socket.off('data_next_patient');
+		 return () => this.socket.off('new_patient');
 
 	}
 

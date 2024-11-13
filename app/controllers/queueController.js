@@ -69,11 +69,12 @@ exports.getTickets = async function(req, res){
     ticketNo: ticket.ticketNumber,
     queueId: ticket.queueId,
     name: ticket.patient.name,
+    mobile: ticket.patient.mobile,
     email: ticket.patient.email,
     gender: ticket.patient.gender,
     catatan: ticket.patient.catatan,
     layanan: ticket.patient.layanan,
-    doctor: ticket.doctor || ticket.groomer  ? " "+ticket?.doctor?.name+" /"+ticket?.groomer?.name+"": "No attending physician yet."
+    doctor: ticket.doctor || ticket.groomer  ? " "+ticket?.doctor?.name+" /"+ticket?.groomer?.name+"": "-"
     
   }));
 

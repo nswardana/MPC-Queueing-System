@@ -6,6 +6,11 @@ const Ticket = db.Ticket;
 const Message = db.Message;
 
 const io = require('../io/io').getIo();
+const home = io.of('/').on('connection', socket=>{
+  //console.log("Connected from PATIENT.");
+});
+
+
 exports.create = async function(req, res){
 	let {name, email, mobile, gender,rekam_medis, layanan,street,tanggal,catatan} = req.body;
 	
@@ -71,7 +76,7 @@ exports.create = async function(req, res){
 				message,
 				issent
 			});
-
+			home.emit("new_patient",data);
 		}
 		catch(e){
 			result.success = false;
