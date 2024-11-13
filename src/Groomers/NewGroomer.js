@@ -16,7 +16,8 @@ class NewGroomer extends Component{
       		onDuty: true,
 			submitDisabled: false,
 			resetDisabled: false,
-			errorMessages: []
+			errorMessages: [],
+			submitDisabled: true
 		};
 		this.state = this.initialState;
 		
@@ -25,7 +26,8 @@ class NewGroomer extends Component{
 	updateName(value){
 		//console.log(value);
 		this.setState({
-			name: value
+			name: value,
+			submitDisabled: false
 		});
 	}
 

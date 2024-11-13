@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { config } from '../Config/config.js';
 import Select from 'react-select'
 import axios from 'axios';
+import ReactLoading from 'react-loading';
 
 class NewDoctor extends Component{
 
@@ -11,9 +12,10 @@ class NewDoctor extends Component{
 		this.initialState =  {
 			name: '',
       		onDuty: true,
-			submitDisabled: false,
+			submitDisabled: true,
 			resetDisabled: false,
-			errorMessages: []
+			errorMessages: [],
+			isLoading: false
 		};
 		this.state = this.initialState;
 		
@@ -22,7 +24,8 @@ class NewDoctor extends Component{
 	updateName(value){
 		//console.log(value);
 		this.setState({
-			name: value
+			name: value,
+			submitDisabled: false,
 		});
 	}
 
@@ -35,11 +38,16 @@ class NewDoctor extends Component{
 		let doctorclinics = (await axios.get(`${this.URL}/api/doctorclinic`)).data;
 		var doctors = [];
 		var i ;
+		this.setState({
+			 isLoading:true
+		});
 		for(i=0; i < doctorclinics.length; i++){
 			var option= {value: doctorclinics[i].name, label: doctorclinics[i].name };
 			doctors.push(option);
 		}
-		//doctors=options;
+		this.setState({
+			isLoading:false
+	   	});
 		this.setState({doctors});
 
 	}
@@ -73,7 +81,12 @@ class NewDoctor extends Component{
 				<div className="container card" style={{marginTop: '20px', marginBottom: '20px'}}>
 					<div className="form-group">
 						<label htmlFor="doctor" className="text-danger">Doctor</label>
-						<Select options={this.state.doctors} onChange={(e) => this.updateName(e.value)} />
+						
+						{ this.state.isLoading ?<ReactLoading type={"bars"} color={"#000"} height={'10%'} width={'10%'} />: 
+							<Select options={this.state.doctors} onChange={(e) => this.updateName(e.value)} />
+
+							 }	
+											
 					</div>
 					
 					<div className="form-group">

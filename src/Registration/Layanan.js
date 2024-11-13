@@ -14,7 +14,7 @@ class Layanan extends Component{
 		return (<React.Fragment>
 			<div className="container">
 			  <div className="row">
-			    <div className="col-4 card">
+			   		<div className="col-4 card">
 					<DataPatient patient={this.props.location.state}/>
 				    </div>
 			    	<div className="col-8 card">

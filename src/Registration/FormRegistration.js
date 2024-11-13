@@ -12,6 +12,7 @@ class FormRegistration extends Component{
 		super(props);
 		this.URL = config.URL;
 		this.socket=io.connect(this.URL);
+		
 		this.initialState =  {
 			layanan: '',
 			tanggal: new Date(),
@@ -21,6 +22,7 @@ class FormRegistration extends Component{
 			errorMessages: [],
 			isLoading: false
 		};
+
 		this.state = this.initialState;
 		this.updateTanggal = this.updateTanggal.bind(this);
 		this._isMounted = false; // Flag untuk mengecek status kompon
@@ -82,6 +84,7 @@ class FormRegistration extends Component{
 	    await axios.post(`${this.URL}/patients/create`, {
 			name, email, mobile, gender,rekam_medis, layanan,street,tanggal,catatan
 	    }).then(response => {
+			console.log("response");
 			console.log(response);
 	    	this.setState(this.initialState);
 	    	this.setState({ isLoading:false});
@@ -89,7 +92,10 @@ class FormRegistration extends Component{
 			{
 				this.socket.emit("new_patient",this.props.patient);
 				this.props.history.push({
-					pathname: `/registration`
+					pathname: `/registration/print`,
+					state: {
+						data: response.data.data,
+					  },
 				});
 			}else
 			{
