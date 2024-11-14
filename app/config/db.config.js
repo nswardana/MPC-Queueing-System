@@ -1,4 +1,5 @@
 
+/*
 module.exports = {
     HOST: "localhost",
     USER: "odoo_user",
@@ -13,7 +14,7 @@ module.exports = {
       idle: 10000
     }
   };
-/*
+*/
 module.exports = {
     HOST: "localhost",
     USER: "postgres",
@@ -28,4 +29,4 @@ module.exports = {
       idle: 10000
     }
   };
-  */
+  
