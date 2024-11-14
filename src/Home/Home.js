@@ -15,8 +15,10 @@ class Home extends Component{
 			    </div>
 				  {*/}
 			    <div className="col-12 card">
-			    	<DisplayQueue />
+			    	  {/*}
+					<DisplayQueue />
 					<DisplayGrooming />
+					  {*/}
 			    </div>
 			  </div>
 			</div>

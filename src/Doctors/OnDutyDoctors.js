@@ -30,11 +30,15 @@ class OnDutyDoctors extends Component{
       });
   }
 
- componentWillUnmount() {
+  componentWillUnmount() {
     this._isMounted = false;
-    return () => this.socket.off('doctorToggleDuty');
+
+    // Cleanup socket listeners to avoid memory leaks
+    if (this.socket) {
+      this.socket.off('doctorToggleDuty');
+    }
   }
-  
+
   async refresh(){
     let onDutyDoctors = (await axios.get(`${this.URL}/doctors/getondutydoctors`)).data;
     this.setState({

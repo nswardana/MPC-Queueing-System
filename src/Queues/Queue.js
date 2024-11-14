@@ -23,34 +23,24 @@ class Queue extends Component{
 	componentDidMount(){
 		console.log('componentDidMount');
 		console.log(this.socket);
-		
 		this.socket.on("new_patient", (data) => {
 			console.log("new_patient"); // Log the received message data to the console
 			console.log(data); // Log the received message data to the console
 			this.refreshTickets();
 		});
-
-		this.socket.on("next_patient_grooming", (data) => {
-			console.log("next_patient_grooming"); // Log the received message data to the console
-			console.log(data); // Log the received message data to the console
+		this.socket.on("next", () => {
 			this.refreshTickets();
 		});
-
-		this.socket.on("next_patient_doctor", (data) => {
-			console.log("next_patient_doctor"); // Log the received message data to the console
-			console.log(data); // Log the received message data to the console
-			this.refreshTickets();
-		});
-
-
+		
 	}
 
-	componentDidUnmount()
-	{
-		 return () => this.socket.off('new_patient');
-
+	componentWillUnmount() {
+		// Cleanup the socket event listeners when the component unmounts
+		if (this.socket) {
+		  this.socket.off('new_patient');
+		}
 	}
-
+	
 	async refreshTickets(){
 		let tickets = (await axios.get(`${this.URL}/queues/gettickets`)).data;
 		this.setState({
