@@ -12,9 +12,6 @@ const server = http.createServer(app);
 const ioUtil = require('./io/io');
 const path = require('path');
 
-let queue = []; // Array to store queue numbers
-let currentTicket = 0; // Track the current ticket number
-
 
 /*
 const socketIo = require('socket.io');

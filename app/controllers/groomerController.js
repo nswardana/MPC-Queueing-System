@@ -154,14 +154,17 @@ exports.nextPatient = async function(req, res){
       console.log(groomer);
 
         //jika ada tiket yang diambil, tiket itu di ubah menjadi update
-      console.log(">>>> jika ada tiket yang diambil, tiket itu di ubah menjadi update");      
-      
+      console.log(">>>> jika ada tiket yang diambil, tiket itu di close");      
       if(groomer.Tickets.length>0){
         let ticket = await Ticket.findByPk(groomer.Tickets[0].id);
         await ticket.update({
           isActive: false
         });
         result.message = "Successfully closed current ticket.";
+
+        home.emit('close_patient_grooming', {ticketId :groomer.Tickets[0].id});
+
+
       }
 
       console.log(">>>> jika tidak ada tiket, cari tiket berikutnya yang layanannya");      
@@ -181,8 +184,15 @@ exports.nextPatient = async function(req, res){
           attributes: ['id'],
           where: {
             isActive: true
-          }
-        }],
+          },
+        },
+        {
+          model: Groomer,
+          as: 'groomer',
+          attributes: ['name']
+          
+        }
+        ],
         order: [['ticketNumber', 'ASC']]
       });
 
@@ -190,11 +200,21 @@ exports.nextPatient = async function(req, res){
         await groomer.addTicket(nextTicket[0]);
         result.data    = nextTicket[0];
         result.message = "Successfully closed current ticket and moved to the next patient.";
+
+        var data ={ ticketId: nextTicket[0].id,
+            ticketNumber: nextTicket[0].ticketNumber,
+            patient: "",
+            groomer: groomer.name
+        }
+
       }
+
       result.success = true;
         //home.emit('next');
-      console.log(">>>> next_patient_grooming emit");      
-      home.emit('next_patient_grooming', {data :result.data });
+      console.log(">>>> next_patient_grooming emit");  
+      console.log(data );  
+      
+      home.emit('next_patient_grooming', {data :data });
 
     } catch(e){
       result.success = false;
