@@ -114,7 +114,7 @@ class OnDutyDoctors extends Component {
         {this.state.isLoading ? (
           // Display ReactLoading spinner when loading data
           <div className="col-12 text-center">
-            <ReactLoading type={"spin"} color={"#000"} height={50} width={50} />
+            <ReactLoading type={"bars"} color={"#000"} height={50} width={50} />
           </div>
         ) : (
           // When data is loaded, display the on-duty doctors

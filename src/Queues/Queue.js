@@ -6,7 +6,6 @@ import OnDutyGroomers from '../Groomers/OnDutyGroomers';
 
 import axios from 'axios';
 import { config } from '../Config/config.js';
-import socketIOClient from "socket.io-client";
 import io from "socket.io-client";
 
 class Queue extends Component {
@@ -17,13 +16,13 @@ class Queue extends Component {
     this.state = {
       tickets: [],
       socketConnected: false, // Track socket connection state
+      loading: false,
     };
   }
 
   componentDidMount() {
     console.log('componentDidMount');
     console.log(this.socket);
-    this._isMounted = true;  // Set to true when component is mounted
 
     // Listen for socket connection and disconnection events
     this.socket.on('connect', () => {
@@ -37,52 +36,45 @@ class Queue extends Component {
     });
 
     // Listen for the "new_patient" event
-    this.socket.on("new_patient", (data) => {
-      console.log("new_patient", data);
-      if (this._isMounted) { // Only update state if component is mounted
-        this.refreshTickets();
-      }
+    this.socket.on("new_patient", () => {
+      console.log("new_patient event received");
+      this.refreshTickets();  // Trigger ticket refresh
     });
 
     // Listen for the "next" event
     this.socket.on("next", () => {
-      if (this._isMounted) { // Only update state if component is mounted
-        this.refreshTickets();
-      }
+      console.log("next event received");
+      this.refreshTickets();  // Trigger ticket refresh
     });
 
     // Initial ticket refresh
     this.refreshTickets();
   }
 
-  // Flag to track if the component is mounted
-  //_isMounted = false;
-
   componentWillUnmount() {
-    this._isMounted = false; // Component is unmounted, prevent state updates
     console.log('Cleaning up socket listeners');
-
-    // Cleanup socket event listeners
+    
+    // Cleanup socket event listeners to prevent memory leaks
     if (this.socket) {
       this.socket.off('new_patient');
       this.socket.off('next');
-      this.socket.disconnect(); // Disconnect the socket when unmounting
+      this.socket.disconnect();  // Disconnect socket when unmounting
     }
   }
 
+  // Refresh tickets list and set loading state
   async refreshTickets() {
+    this.setState({ loading: true });  // Set loading to true when fetching data
     try {
-      let tickets = (await axios.get(`${this.URL}/queues/gettickets`)).data;
-      if (this._isMounted) { // Check if component is still mounted before setting state
-        this.setState({
-          tickets,
-        });
-      }
+      let tickets = await axios.get(`${this.URL}/queues/gettickets`);
+      this.setState({ tickets: tickets.data, loading: false });
     } catch (error) {
-      console.error('Error refreshing tickets:', error);
+      console.error('Error fetching tickets:', error);
+      this.setState({ loading: false });
     }
   }
 
+  // Get active tickets count
   getActiveTickets() {
     return this.state.tickets.filter(ticket => ticket.isActive === true).length;
   }
@@ -111,10 +103,8 @@ class Queue extends Component {
           </div>
           <div className="row">
             <div className="col-12 card" style={{ marginTop: '20px' }}>
-              <QueueTickets
-                refreshTickets={() => this.refreshTickets()}
-                tickets={this.state.tickets}
-              />
+              {/* Pass loading and tickets to QueueTickets */}
+              <QueueTickets tickets={this.state.tickets} loading={this.state.loading} refreshTickets={() => this.refreshTickets()} />
             </div>
           </div>
         </div>
