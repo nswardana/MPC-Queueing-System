@@ -146,15 +146,17 @@ exports.getTicketsWithDoctors = async function(req, res){
     {
       model: Doctor,
       as: 'doctor',
-      attributes: ['name']
+      attributes: ['id','name']
     }
     ]
   });
   const result = ticketsWithDoctors.map(ticket => {
-    return { ticketId: ticket.id,
+    return { 
+      ticketId: ticket.id,
       ticketNumber: ticket.ticketNumber,
       patient: ticket.patient.name,
-      doctor: ticket.doctor.name
+      doctor: ticket.doctor.name,
+      doctorId: ticket.doctor.id
     };
   });
   res.send(result);
