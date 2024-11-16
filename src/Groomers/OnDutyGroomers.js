@@ -13,76 +13,61 @@ class OnDutyGroomers extends Component {
       onDutyGroomers: [],
       isLoading: false,
     };
+    this._isMounted = false;  // Track if the component is mounted
   }
 
   componentDidMount() {
-    this.refresh();
-    this.socket.on("groomerToggleDuty", (data) => {
-      this.refresh();
+    this._isMounted = true;  // Set to true when component is mounted
+    this.refresh();  // Initial data fetch
+    this.socket.on('groomerToggleDuty', () => {
+      if (this._isMounted) {  // Check if component is still mounted
+        this.refresh();  // Refresh data when event occurs
+      }
     });
   }
 
   componentWillUnmount() {
-    // Cleanup socket listeners to avoid memory leaks
+    this._isMounted = false;  // Set to false when component is unmounted
     if (this.socket) {
-      this.socket.off('groomerToggleDuty');
+      this.socket.off('groomerToggleDuty');  // Clean up event listeners
+      this.socket.disconnect();  // Optional: Disconnect the socket if no longer needed
     }
   }
 
   async refresh() {
     try {
-      let onDutyGroomers = (await axios.get(`${this.URL}/groomers/getondutygroomers`)).data;
-      this.setState({
-        onDutyGroomers,
-      });
+      const response = await axios.get(`${this.URL}/groomers/getondutygroomers`);
+      if (this._isMounted) {
+        this.setState({ onDutyGroomers: response.data });
+      }
     } catch (error) {
       console.error('Error fetching on-duty groomers:', error);
     }
   }
 
-  getTicket(doctor) {
-    if (doctor.ticketNumber) {
-      return doctor.ticketNumber.toString().padStart(4, '0');
-    } else {
-      return 'Available';
-    }
+  getTicket(groomer) {
+    return groomer.ticketNumber ? groomer.ticketNumber.toString().padStart(4, '0') : 'Available';
   }
 
   getPatient(groomer) {
-    if (groomer.patientFirstName) {
-      let patient = `${groomer.patientFirstName} ${groomer.patientLastName}`;
-      return (
-        <React.Fragment>
-          <strong className="text-danger">Patient: </strong> {patient}
-        </React.Fragment>
-      );
-    } else {
-      return (
-        <React.Fragment>
-          <strong className="text-danger">Patient: </strong>No patient.
-        </React.Fragment>
-      );
-    }
+    return groomer.patientFirstName
+      ? <React.Fragment><strong className="text-danger">Patient: </strong> {groomer.patientFirstName} {groomer.patientLastName}</React.Fragment>
+      : <React.Fragment><strong className="text-danger">Patient: </strong>No patient.</React.Fragment>;
   }
 
   async nextPatientGroomer(groomerId) {
-    this.setState({
-      isLoading: true,
-    });
+    this.setState({ isLoading: true });
 
     try {
       const result = await axios.post(`${this.URL}/groomers/nextpatient`, { groomerId });
-      this.setState({
-        isLoading: false,
-      });
-      this.refresh();
-      this.props.refreshTickets();
-      console.log('nextPatientGroomer', result);
+      if (this._isMounted) {
+        this.setState({ isLoading: false });
+        this.refresh();  // Refresh data after updating the groomer's patient
+        this.props.refreshTickets();  // Notify parent to refresh ticket list
+      }
     } catch (error) {
-      this.setState({
-        isLoading: false,
-      });
-      console.error('Error in nextPatientGroomer:', error.response || error.message);
+      this.setState({ isLoading: false });
+      console.error('Error in nextPatientGroomer:', error);
     }
   }
 
@@ -96,9 +81,7 @@ class OnDutyGroomers extends Component {
               <div className="card-body">
                 <h4>{this.getTicket(onDutyGroomer)}</h4>
                 <div className="card-text">
-                  <p>
-                    <strong className="text-danger">Groomer:</strong> {onDutyGroomer.groomerName}
-                  </p>
+                  <p><strong className="text-danger">Groomer:</strong> {onDutyGroomer.groomerName}</p>
                   <p>{this.getPatient(onDutyGroomer)}</p>
                 </div>
               </div>

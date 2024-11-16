@@ -1,3 +1,4 @@
+
 'use strict';
 const db = require('../models/index.js');
 const Doctor = db.Doctor;
@@ -155,14 +156,13 @@ exports.nextPatient = async function(req, res){
       });
       console.log("doctor");      
       console.log(doctor);
-
-      
       //jika ada tiket yang diambil, tiket itu di ubah menjadi update
       if(doctor.Tickets.length>0){
         let ticket = await Ticket.findByPk(doctor.Tickets[0].id);
         await ticket.update({
           isActive: false
         });
+        home.emit('close_patient_doctor', {ticketId :doctor.Tickets[0].id});
         result.message = "Successfully closed current ticket.";
       }
 
@@ -189,14 +189,30 @@ exports.nextPatient = async function(req, res){
       
       if(nextTicket[0]){
         //masukan tiket no 1 ke dokter yang berjaga
-        await doctor.addTicket(nextTicket[0]);
-        result.data    = nextTicket[0];
-        result.message = "Successfully closed current ticket and moved to the next patient.";
+          await doctor.addTicket(nextTicket[0]);
+          result.data    = nextTicket[0];
+          result.message = "Successfully closed current ticket and moved to the next patient.";
+
+          console.log("nextTicket[0]");      
+          console.log(nextTicket[0]);
+
+
+          console.log(">>>> next_patient_doctor emit");  
+
+          var data ={ 
+            doctorId: doctor.id,
+            doctorName: doctor.name,
+            ticketId: nextTicket[0].id,
+            ticketNumber: nextTicket[0].ticketNumber,
+            patientFirstName: "",
+            patientLastName: ""
+          }
+
       }
+      home.emit('next_patient_doctor', {data :data});
       result.success = true;
       //home.emit('next');
-
-      home.emit('next_patient_doctor', {data :result.data });
+      
 
 
     } catch(e){

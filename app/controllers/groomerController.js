@@ -161,10 +161,7 @@ exports.nextPatient = async function(req, res){
           isActive: false
         });
         result.message = "Successfully closed current ticket.";
-
         home.emit('close_patient_grooming', {ticketId :groomer.Tickets[0].id});
-
-
       }
 
       console.log(">>>> jika tidak ada tiket, cari tiket berikutnya yang layanannya");      
@@ -211,7 +208,7 @@ exports.nextPatient = async function(req, res){
 
       result.success = true;
         //home.emit('next');
-      console.log(">>>> next_patient_grooming emit");  
+      console.log(">>>> next_patient_grooming emit"); 
       console.log(data );  
       
       home.emit('next_patient_grooming', {data :data });

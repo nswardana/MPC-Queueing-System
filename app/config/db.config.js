@@ -1,5 +1,5 @@
-
 /*
+
 module.exports = {
     HOST: "localhost",
     USER: "odoo_user",
@@ -29,5 +29,5 @@ module.exports = {
       idle: 10000
     }
   };
-  
+
   

@@ -9,83 +9,118 @@ import { config } from '../Config/config.js';
 import socketIOClient from "socket.io-client";
 import io from "socket.io-client";
 
-class Queue extends Component{
+class Queue extends Component {
+  constructor() {
+    super();
+    this.URL = config.URL;
+    this.socket = io.connect(this.URL); // Socket connection
+    this.state = {
+      tickets: [],
+      socketConnected: false, // Track socket connection state
+    };
+  }
 
-	constructor(){
-		super();
-		this.URL = config.URL;
-		this.socket=io.connect(this.URL);
-		this.state = ({
-			tickets: []
-		});
-	}
+  componentDidMount() {
+    console.log('componentDidMount');
+    console.log(this.socket);
+    this._isMounted = true;  // Set to true when component is mounted
 
-	componentDidMount(){
-		console.log('componentDidMount');
-		console.log(this.socket);
-		this.socket.on("new_patient", (data) => {
-			console.log("new_patient"); // Log the received message data to the console
-			console.log(data); // Log the received message data to the console
-			this.refreshTickets();
-		});
-		this.socket.on("next", () => {
-			this.refreshTickets();
-		});
-		
-	}
+    // Listen for socket connection and disconnection events
+    this.socket.on('connect', () => {
+      console.log('Socket connected');
+      this.setState({ socketConnected: true });
+    });
 
-	componentWillUnmount() {
-		// Cleanup the socket event listeners when the component unmounts
-		if (this.socket) {
-		  this.socket.off('new_patient');
-		}
-	}
-	
-	async refreshTickets(){
-		let tickets = (await axios.get(`${this.URL}/queues/gettickets`)).data;
-		this.setState({
-			tickets
-		});
-	}
+    this.socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+      this.setState({ socketConnected: false });
+    });
 
-	getActiveTickets(){
-		let activeTickets = this.state.tickets.map(ticket=>{
-			return ticket.isActive === true;
-		}).length;
-		return activeTickets;
-	}
+    // Listen for the "new_patient" event
+    this.socket.on("new_patient", (data) => {
+      console.log("new_patient", data);
+      if (this._isMounted) { // Only update state if component is mounted
+        this.refreshTickets();
+      }
+    });
 
-	render(){
-		return (
-			<React.Fragment>
-			<div className="container">
-				<div className="row">
-					<div className="col-2 card">
-						<div className="container">
-							<div className="row">
-								<QueueControl
-									refreshTickets={() => this.refreshTickets()}
-									activeTickets={this.getActiveTickets()}
-									totalTickets={this.state.tickets.length}/>
-							</div>
-						</div>
-					</div>
-					<div className="col-10 card" style={{marginLeft:'0px'}}>
-						<OnDutyDoctors socket={this.socket} refreshTickets={() => this.refreshTickets()}/>
-						<OnDutyGroomers socket={this.socket} refreshTickets={() => this.refreshTickets()}/>
-					</div>
-				</div>
-				<div className="row">
-					<div className="col-12 card" style={{marginTop:'20px'}}>
-						<QueueTickets
-							refreshTickets={() => this.refreshTickets()}
-							tickets={this.state.tickets}
-						/>
-					</div>
-				</div>
-			</div>
-			</React.Fragment>
-		);
-	}
+    // Listen for the "next" event
+    this.socket.on("next", () => {
+      if (this._isMounted) { // Only update state if component is mounted
+        this.refreshTickets();
+      }
+    });
+
+    // Initial ticket refresh
+    this.refreshTickets();
+  }
+
+  // Flag to track if the component is mounted
+  //_isMounted = false;
+
+  componentWillUnmount() {
+    this._isMounted = false; // Component is unmounted, prevent state updates
+    console.log('Cleaning up socket listeners');
+
+    // Cleanup socket event listeners
+    if (this.socket) {
+      this.socket.off('new_patient');
+      this.socket.off('next');
+      this.socket.disconnect(); // Disconnect the socket when unmounting
+    }
+  }
+
+  async refreshTickets() {
+    try {
+      let tickets = (await axios.get(`${this.URL}/queues/gettickets`)).data;
+      if (this._isMounted) { // Check if component is still mounted before setting state
+        this.setState({
+          tickets,
+        });
+      }
+    } catch (error) {
+      console.error('Error refreshing tickets:', error);
+    }
+  }
+
+  getActiveTickets() {
+    return this.state.tickets.filter(ticket => ticket.isActive === true).length;
+  }
+
+  render() {
+    return (
+      <React.Fragment>
+        <div className="container">
+          <div className="row">
+            <div className="col-2 card">
+              <div className="container">
+                <div className="row">
+                  <QueueControl
+                    socket={this.socket}
+                    refreshTickets={() => this.refreshTickets()}
+                    activeTickets={this.getActiveTickets()}
+                    totalTickets={this.state.tickets.length}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="col-10 card" style={{ marginLeft: '0px' }}>
+              <OnDutyDoctors socket={this.socket} refreshTickets={() => this.refreshTickets()} />
+              <OnDutyGroomers socket={this.socket} refreshTickets={() => this.refreshTickets()} />
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-12 card" style={{ marginTop: '20px' }}>
+              <QueueTickets
+                refreshTickets={() => this.refreshTickets()}
+                tickets={this.state.tickets}
+              />
+            </div>
+          </div>
+        </div>
+      </React.Fragment>
+    );
+  }
 }
+
 export default Queue;

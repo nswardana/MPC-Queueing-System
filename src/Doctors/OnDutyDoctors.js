@@ -11,8 +11,6 @@ class OnDutyDoctors extends Component{
   constructor(){
     super();
     this.URL = config.URL;
-    //this.socket=io.connect(this.URL);
-    //this.socket=this.props.socket;
     this.state = {
       onDutyDoctors: [],
       isLoading: false
@@ -23,7 +21,6 @@ class OnDutyDoctors extends Component{
 
   componentDidMount(){
       this._isMounted = true;
-
   		this.refresh();
       this.props.socket.on("doctorToggleDuty", (data)=>{
         this.refresh();

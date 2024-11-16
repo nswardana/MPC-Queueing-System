@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
 // Initialize a new instance of Socket.IO by passing the HTTP server
 const { Server } = require("socket.io"); // Import Socket.IO Server class
 const io = new Server(server, {
-    transports: ['websocket', 'polling'],
+    transports: ['polling'],
     logLevel: 2, // Log more info
     pingTimeout: 60000,
     pingInterval: 25000,

@@ -32,7 +32,7 @@
     "sequelize": "^6.32.0",
     "sequelize-cli": "^5.4.0",
     "socket.io": "^4.8.0",
-    "socket.io-client": "^3.1.2"
+    "socket.io-client": "^4.8.0"
   },
   "scripts": {
     "start": "PORT=4001 NODE_OPTIONS=--openssl-legacy-provider react-scripts start",
