@@ -40,14 +40,6 @@ class SearchPatient extends Component{
 		}
 	}
 
-   	 async refresh(){
-        let patients = (await axios.get(`${this.URL}/doctors/getondutydoctors`)).data;
-        this.setState({
-            patients
-        });
-      }
-    
-
 	async submit(){
 		this.setState({
 		  submitDisabled: true,
@@ -56,7 +48,7 @@ class SearchPatient extends Component{
 	    });
 		let {no_hp} = this.state;
 
-	    await axios.get(`${this.URL}/api/patientclinic`, { params: { mobile: no_hp } }).then(response => {
+	    await axios.get(`${this.URL}/api/patientclinic`, { params: { keyword: no_hp } }).then(response => {
 			this.handleResult(response.data);
 			this.setState({ isLoading:false});
 	    }).catch(function(error){

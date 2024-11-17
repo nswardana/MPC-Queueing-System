@@ -11,7 +11,7 @@ class OnDutyGroomers extends Component {
     this.socket = io.connect(this.URL);  // Ensure the Socket.IO connection
     this.state = {
       onDutyGroomers: [],
-      isLoading: false,  // Track loading state for fetching or operations
+      groomerLoadingStatus: {}, // Track loading state for each groomer
     };
     this._isMounted = false;  // Track if the component is mounted
   }
@@ -35,17 +35,15 @@ class OnDutyGroomers extends Component {
     }
   }
 
+  // Safe async method with mounted check
   async refresh() {
-    this.setState({ isLoading: true });  // Start loading when fetching data
+    this.setState({ groomerLoadingStatus: {} });  // Reset all loading states when fetching data
     try {
       const response = await axios.get(`${this.URL}/groomers/getondutygroomers`);
       if (this._isMounted) {
-        this.setState({ onDutyGroomers: response.data, isLoading: false });
+        this.setState({ onDutyGroomers: response.data });
       }
     } catch (error) {
-      if (this._isMounted) {
-        this.setState({ isLoading: false });
-      }
       console.error('Error fetching on-duty groomers:', error);
     }
   }
@@ -63,71 +61,76 @@ class OnDutyGroomers extends Component {
   }
 
   async nextPatientGroomer(groomerId) {
-    this.setState({ isLoading: true });  // Set loading state while performing the operation
+    this.setState(prevState => ({
+      groomerLoadingStatus: { ...prevState.groomerLoadingStatus, [groomerId]: true } // Set specific groomer loading state to true
+    }));
 
     try {
       const result = await axios.post(`${this.URL}/groomers/nextpatient`, { groomerId });
       if (this._isMounted) {
-        this.setState({ isLoading: false });
+        this.setState(prevState => ({
+          groomerLoadingStatus: { ...prevState.groomerLoadingStatus, [groomerId]: false } // Set specific groomer loading state to false after processing
+        }));
         this.refresh();  // Refresh the list of on-duty groomers
         this.props.refreshTickets();  // Notify parent to refresh ticket list
       }
     } catch (error) {
       if (this._isMounted) {
-        this.setState({ isLoading: false });
+        this.setState(prevState => ({
+          groomerLoadingStatus: { ...prevState.groomerLoadingStatus, [groomerId]: false } // Handle error and stop loading
+        }));
       }
       console.error('Error in nextPatientGroomer:', error);
     }
   }
 
   render() {
-    const { onDutyGroomers, isLoading } = this.state;
+    const { onDutyGroomers, groomerLoadingStatus } = this.state;
 
     return (
       <div className="row" style={{ marginTop: '20px', marginBottom: '20px', marginLeft: '5px', marginRight: '5px' }}>
-        {isLoading ? (
-          <div className="col-12 text-center">
-            <ReactLoading type="bars" color="#000" height={50} width={50} />
-          </div>
+        {onDutyGroomers.length === 0 ? (
+          <div className="col-12 text-center">No on-duty groomers.</div>
         ) : (
-          <>
-            {onDutyGroomers.length === 0 ? (
-              'No on-duty groomers.'
-            ) : (
-              onDutyGroomers.map((onDutyGroomer) => (
-                <div
-                  key={onDutyGroomer.groomerId}
-                  className="col-sm-3 card text-center"
-                  style={{
-                    marginLeft: '5px',
-                    marginTop: '5px',
-                    padding: '0px',
-                    backgroundColor: 'rgba(102, 0, 51, 0.3)',
-                  }}
-                >
-                  <div className="card-body">
-                    <h4>{this.getTicket(onDutyGroomer)}</h4>
-                    <div className="card-text">
-                      <p>
-                        <strong className="text-danger">Groomer:</strong> {onDutyGroomer.groomerName}
-                      </p>
-                      <p>{this.getPatient(onDutyGroomer)}</p>
-                    </div>
-                  </div>
-
-                  <div className="card-footer">
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => this.nextPatientGroomer(onDutyGroomer.groomerId)}
-                      disabled={isLoading} // Disable the button while loading
-                    >
-                      Next Patient
-                    </button>
-                  </div>
+          onDutyGroomers.map((onDutyGroomer) => (
+            <div
+              key={onDutyGroomer.groomerId}
+              className="col-sm-3 card text-center"
+              style={{
+                marginLeft: '5px',
+                marginTop: '5px',
+                padding: '0px',
+                backgroundColor: 'rgba(102, 0, 51, 0.3)',
+              }}
+            >
+              <div className="card-body">
+                <h4>{this.getTicket(onDutyGroomer)}</h4>
+                <div className="card-text">
+                  <p>
+                    <strong className="text-danger">Groomer:</strong> {onDutyGroomer.groomerName}
+                  </p>
+                  <p>{this.getPatient(onDutyGroomer)}</p>
                 </div>
-              ))
-            )}
-          </>
+              </div>
+
+              <div className="card-footer">
+                {groomerLoadingStatus[onDutyGroomer.groomerId] ? (
+                  // Show the loading spinner only for the specific groomer that is being processed
+                  <div className="col-12 text-center">
+                    <ReactLoading type="bars" color="#000" height={30} width={30} />
+                  </div>
+                ) : (
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => this.nextPatientGroomer(onDutyGroomer.groomerId)}
+                    disabled={groomerLoadingStatus[onDutyGroomer.groomerId]} // Disable button while loading for that specific groomer
+                  >
+                    Next Patient
+                  </button>
+                )}
+              </div>
+            </div>
+          ))
         )}
       </div>
     );
