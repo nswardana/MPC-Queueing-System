@@ -25,24 +25,10 @@ class QueueTickets extends Component {
     const confirmCancel = window.confirm(`Are you sure you want to cancel ticket #${ticketId}?`);
     if (confirmCancel) {
       try {
-        const response = await axios.post(`${this.URL}/queues/closeticket`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ticketId }), // Send ticketId in the body
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          alert(result.message);
-          this.props.refreshTickets(); // Refresh the tickets after canceling
-        } else {
-          alert(result.message || 'Failed to cancel the ticket.');
-        }
+        const response = await axios.post(`${this.URL}/queues/closeticket`, {ticketId});
+        this.props.refreshTickets();
       } catch (error) {
         console.error('Error canceling ticket:', error);
-        alert('An error occurred while canceling the ticket.');
       }
     }
   }
