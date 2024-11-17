@@ -81,7 +81,7 @@ class SearchPatient extends Component{
 						}
 					</div>
                     <div className="form-group custom-search">
-                        <input type="text" className="form-control custom-search-input" placeholder="Masukan no hp" onBlur={(e) => this.updateNohp(e.target.value)} onChange={(e) => this.updateNohp(e.target.value)}
+                        <input type="text" className="form-control custom-search-input" placeholder="Masukan no hp atau nama" onBlur={(e) => this.updateNohp(e.target.value)} onChange={(e) => this.updateNohp(e.target.value)}
 							value={this.state.no_hp}  onKeyPress={event => {
 								if (event.key === 'Enter') {
 									this.submit()

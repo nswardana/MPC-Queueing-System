@@ -16,6 +16,7 @@ const home = io.of('/').on('connection', socket=>{
 });
 */
 
+
 exports.getActiveQueue = async function(req, res){
   let queue = await Queue.findAll({
     attributes: ['id', 'startDate'],
@@ -29,57 +30,71 @@ exports.getActiveQueue = async function(req, res){
   res.send(queue);
 }
 
-exports.getTickets = async function(req, res){
-  let tickets = await Ticket.findAll({
-    attributes: ['id', 'ticketNumber', 'queueId'],
-    where:{
-      isActive: true
-    },
-    order:[['ticketNumber']],
-    include: [{
-        model: Queue,
-        as: 'queue',
-        attributes: ['id'],
-        where: {
-          isActive: true
-        }
-      },
-      {
-        model: Patient,
-        as: 'patient',
-        attributes: ['name', 'email', 'mobile', 'rekam_medis', 'gender','layanan','catatan']
-      },
-      {
-        model: Doctor,
-        as: 'doctor',
-        attributes: ['name'],
-        required: false
-      },
-      {
-        model: Groomer,
-        as: 'groomer',
-        attributes: ['name'],
-        required: false
-      }
-    ]
+
+// Helper function to map tickets with related patient, doctor, and groomer info
+function mapTickets(tickets) {
+  return tickets.map(ticket => {
+    const result = {
+      ticketNo: ticket.ticketNumber,
+      queueId: ticket.queueId,
+      name: ticket.patient.name,
+      mobile: ticket.patient.mobile,
+      email: ticket.patient.email,
+      gender: ticket.patient.gender,
+      catatan: ticket.patient.catatan,
+      layanan: ticket.patient.layanan,
+      doctor: ticket.doctor ? ` ${ticket.doctor.name}` : "",
+      groomer: ticket.groomer ? ` /${ticket.groomer.name}` : "",
+    };
+
+    // Combining doctor and groomer into one field if both are available
+    result.doctor = result.doctor + result.groomer;
+    delete result.groomer; // Remove groomer field to avoid redundancy
+
+    return result;
   });
-
-  const result = tickets.map(ticket=>(
-  {
-    ticketNo: ticket.ticketNumber,
-    queueId: ticket.queueId,
-    name: ticket.patient.name,
-    mobile: ticket.patient.mobile,
-    email: ticket.patient.email,
-    gender: ticket.patient.gender,
-    catatan: ticket.patient.catatan,
-    layanan: ticket.patient.layanan,
-    doctor: ticket.doctor || ticket.groomer  ? " "+ticket?.doctor?.name+" /"+ticket?.groomer?.name+"": "-"
-    
-  }));
-
-  res.send(result);
 }
+
+exports.getTickets = async function(req, res) {
+  try {
+    let tickets = await Ticket.findAll({
+      attributes: ['id', 'ticketNumber', 'queueId'],
+      where: { isActive: true },
+      order: [['ticketNumber']],
+      include: [
+        {
+          model: Queue,
+          as: 'queue',
+          attributes: ['id'],
+          where: { isActive: true }
+        },
+        {
+          model: Patient,
+          as: 'patient',
+          attributes: ['name', 'email', 'mobile', 'rekam_medis', 'gender', 'layanan', 'catatan']
+        },
+        {
+          model: Doctor,
+          as: 'doctor',
+          attributes: ['name'],
+          required: false
+        },
+        {
+          model: Groomer,
+          as: 'groomer',
+          attributes: ['name'],
+          required: false
+        }
+      ]
+    });
+
+    const result = mapTickets(tickets);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error retrieving tickets.' });
+  }
+};
 
 
 exports.getTicketsWithGroomers = async function(req, res){

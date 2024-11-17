@@ -52,7 +52,8 @@ class QueueTickets extends Component {
                     </td>
                     <td style={{ width: '300px' }}>{ticket.catatan}</td>
                     <td style={{ width: '100px' }}>
-                      {ticket.doctor !== "-" && <span className="badge badge-success">{ticket.doctor}</span>}
+                      {ticket.doctor !== "" && <span className="badge badge-success">{ticket.doctor}</span>}
+                      {ticket.groomer !== "" && <span className="badge badge-success">{ticket.groomer}</span>}
                     </td>
                   </tr>
                 ))

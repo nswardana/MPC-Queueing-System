@@ -1,0 +1,32 @@
+.icon-menu {
+    padding: 20px;
+  }
+  
+  .menu-card {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  .menu-card:hover {
+    transform: scale(1.05); /* Slight zoom effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-body {
+    padding: 20px;
+  }
+  
+  .card-title {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  
+  @media (max-width: 576px) {
+    .col-12 {
+      margin-bottom: 15px;
+    }
+  }
+  
