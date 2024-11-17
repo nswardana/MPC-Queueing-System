@@ -37,7 +37,15 @@ function NavBar() {
           className="p-2 text-dark"
           activeClassName="text-danger"
           to="/groomers">Groomer</NavLink>
+
+        <NavLink
+          className="p-2 text-dark"
+          activeClassName="text-danger"
+          to="/report">Report</NavLink>
+
+
           </>
+        
         )}
 
       </nav>

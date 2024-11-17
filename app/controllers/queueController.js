@@ -264,3 +264,45 @@ exports.closeTicket = async function(req, res){
   }
   res.send(result);
 }
+
+exports.getInactiveTickets = async function(req, res) {
+  try {
+    let tickets = await Ticket.findAll({
+      where: { 
+        isActive: false // Fetch only inactive tickets
+      },
+      order: [['ticketNumber']],
+      include: [
+        {
+          model: Queue,
+          as: 'queue',
+          attributes: ['id'],
+          where: { isActive: true }
+        },
+        {
+          model: Patient,
+          as: 'patient',
+          attributes: ['name', 'email', 'mobile', 'rekam_medis', 'gender', 'layanan', 'catatan']
+        },
+        {
+          model: Doctor,
+          as: 'doctor',
+          attributes: ['name'],
+          required: false
+        },
+        {
+          model: Groomer,
+          as: 'groomer',
+          attributes: ['name'],
+          required: false
+        }
+      ]
+    });
+
+    const result = mapTickets(tickets);
+    res.send(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error retrieving inactive tickets.' });
+  }
+};

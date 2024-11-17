@@ -7,6 +7,9 @@ import PrintAntrian from './Registration/PrintAntrian';
 import Doctors from './Doctors/Doctors';
 import Groomers from './Groomers/Groomers';
 import Queue from './Queues/Queue';
+import Inactiveickets from './Report/InactiveTickets';
+
+
 import ModalExample from './Home/ModalExample';
 import {Route} from 'react-router-dom';
 
@@ -23,6 +26,7 @@ class App extends Component {
         <Route exact path="/queue" component={Queue} />
         <Route exact path="/doctors" component={Doctors} />
         <Route exact path="/groomers" component={Groomers} />
+        <Route exact path="/report" component={Inactiveickets} />
         <Route exact path="/test" component={ModalExample} />
       </div>
     );
