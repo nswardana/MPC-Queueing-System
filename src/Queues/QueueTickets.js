@@ -1,11 +1,50 @@
 import React, { Component } from 'react';
-import { config } from '../Config/config.js';
+import PropTypes from 'prop-types'; // Import PropTypes for prop validation
 import ReactLoading from 'react-loading'; // Import ReactLoading component
+import { config } from '../Config/config.js';
+import axios from 'axios';
 
 class QueueTickets extends Component {
+
+  constructor() {
+    super();
+    this.URL = config.URL;
+    this.state = {
+    };
+  }
+
+
+
   componentDidMount() {
     // Trigger ticket refresh on component mount
     this.props.refreshTickets();
+  }
+
+  // Handle canceling a ticketId
+  cancelTicket = async (ticketId) => {
+    const confirmCancel = window.confirm(`Are you sure you want to cancel ticket #${ticketId}?`);
+    if (confirmCancel) {
+      try {
+        const response = await axios.post(`${this.URL}/queues/closeticket`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ ticketId }), // Send ticketId in the body
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          alert(result.message);
+          this.props.refreshTickets(); // Refresh the tickets after canceling
+        } else {
+          alert(result.message || 'Failed to cancel the ticket.');
+        }
+      } catch (error) {
+        console.error('Error canceling ticket:', error);
+        alert('An error occurred while canceling the ticket.');
+      }
+    }
   }
 
   render() {
@@ -13,7 +52,7 @@ class QueueTickets extends Component {
 
     return (
       <React.Fragment>
-        <table className="table table-striped table-hover table-bordered" style={{ marginTop: '20px', marginBottom: '20px' }}>
+        <table className="table table-striped table-hover table-bordered" style={{ marginTop: '20px', marginBottom: '20px' }} aria-labelledby="queue-tickets">
           <thead>
             <tr>
               <th className="text-danger">Ticket #</th>
@@ -22,13 +61,14 @@ class QueueTickets extends Component {
               <th className="text-danger">Layanan</th>
               <th className="text-danger">Catatan</th>
               <th className="text-danger">Attending Physician</th>
+              <th className="text-danger">Actions</th>
             </tr>
           </thead>
           <tbody>
             {/* If loading, show a loading spinner */}
             {loading ? (
               <tr>
-                <td colSpan="6" className="text-center">
+                <td colSpan="7" className="text-center">
                   <ReactLoading type="bars" color="#000" height={50} width={50} />
                 </td>
               </tr>
@@ -36,7 +76,7 @@ class QueueTickets extends Component {
               // If there are no tickets
               tickets.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center">
+                  <td colSpan="7" className="text-center">
                     There are no tickets at the moment.
                   </td>
                 </tr>
@@ -55,6 +95,15 @@ class QueueTickets extends Component {
                       {ticket.doctor !== "" && <span className="badge badge-success">{ticket.doctor}</span>}
                       {ticket.groomer !== "" && <span className="badge badge-success">{ticket.groomer}</span>}
                     </td>
+                    <td style={{ width: '100px' }}>
+                      {/* Cancel button */}
+                      <button 
+                        className="btn btn-danger btn-sm" 
+                        onClick={() => this.cancelTicket(ticket.ticketId)} // Call cancelTicket on button click
+                      >
+                        Cancel
+                      </button>
+                    </td>
                   </tr>
                 ))
               )
@@ -65,5 +114,20 @@ class QueueTickets extends Component {
     );
   }
 }
+
+// Prop validation
+QueueTickets.propTypes = {
+  tickets: PropTypes.arrayOf(PropTypes.shape({
+    ticketNo: PropTypes.number.isRequired,
+    name: PropTypes.string.isRequired,
+    gender: PropTypes.string.isRequired,
+    layanan: PropTypes.string.isRequired,
+    catatan: PropTypes.string.isRequired,
+    doctor: PropTypes.string,
+    groomer: PropTypes.string,
+  })).isRequired,
+  loading: PropTypes.bool.isRequired,
+  refreshTickets: PropTypes.func.isRequired, // Function to refresh the ticket list
+};
 
 export default QueueTickets;

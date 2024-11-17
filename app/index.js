@@ -109,6 +109,9 @@ app.get("/queues/getticketswithdoctors", queueController.getTicketsWithDoctors);
 app.get("/queues/getticketsWithGroomers", queueController.getTicketsWithGroomers);
 app.post("/queues/opennewqueue", queueController.openNewQueue);
 app.post("/queues/closeactivequeue", queueController.closeActiveQueue);
+app.post("/queues/closeticket", queueController.closeTicket);
+
+
 
 app.post("/doctors/adddoctor", doctorController.addDoctor);
 app.get("/doctors/getalldoctors", doctorController.getAllDoctors);

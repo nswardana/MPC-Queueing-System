@@ -35,6 +35,7 @@ exports.getActiveQueue = async function(req, res){
 function mapTickets(tickets) {
   return tickets.map(ticket => {
     const result = {
+      ticketId: ticket.id,
       ticketNo: ticket.ticketNumber,
       queueId: ticket.queueId,
       name: ticket.patient.name,
@@ -44,7 +45,7 @@ function mapTickets(tickets) {
       catatan: ticket.patient.catatan,
       layanan: ticket.patient.layanan,
       doctor: ticket.doctor ? ` ${ticket.doctor.name}` : "",
-      groomer: ticket.groomer ? ` /${ticket.groomer.name}` : "",
+      groomer: ticket.groomer ? `${ticket.groomer.name}` : "",
     };
 
     // Combining doctor and groomer into one field if both are available
@@ -234,6 +235,32 @@ exports.closeActiveQueue = async function(req, res){
   catch(e){
     result.success = false;
     result.message = e;
+  }
+  res.send(result);
+}
+
+exports.closeTicket = async function(req, res){
+  let result = {
+    success: false,
+    message: null
+  };
+
+  try {
+    console.log("req.body",req.body);           
+    let { ticketId } = req.body;
+  
+    console.log("ticketId",ticketId);           
+
+    let ticket = await Ticket.findByPk(ticketId);
+    await ticket.update({
+        isActive: false
+      });
+    result.message = "Successfully closed current ticket.";   
+    result.success = true;
+
+  } catch(e){
+    result.success = false;
+    result.message = e.toString();
   }
   res.send(result);
 }
