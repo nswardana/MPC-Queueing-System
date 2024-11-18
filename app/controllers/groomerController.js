@@ -31,6 +31,49 @@ exports.addGroomer = async function(req, res){
   res.send(result);
 }
 
+exports.deleteGroomer = async function(req, res) {
+  let { groomerId } = req.params;  // Extract groomerId from request parameters
+  let result = {
+    success: false,
+    message: null
+  };
+
+  try {
+    // Find the groomer by ID
+    let groomer = await Groomer.findByPk(groomerId);
+    
+    if (!groomer) {
+      result.success = false;
+      result.message = "Groomer not found.";
+      return res.status(404).send(result);  // Respond if groomer doesn't exist
+    }
+
+      /*
+    // If the groomer has any active tickets, you can either unlink them or delete them
+    if (groomer.Tickets.length > 0) {
+      // Unlink the groomer from the tickets
+      await groomer.removeTickets(groomer.Tickets);
+    }
+    */
+
+    // Delete the groomer
+    await groomer.destroy();
+
+    result.success = true;
+    result.message = "Successfully deleted the groomer.";
+
+    // Emit a socket event to notify clients about the groomer deletion (optional)
+    home.emit("groomerDeleted", { groomerId });
+
+  } catch (e) {
+    result.success = false;
+    result.message = e.toString();
+  }
+
+  res.send(result);  // Send the result back to the client
+};
+
+
 exports.toggleDuty = async function(req, res){
 
   let { groomerId } = req.body;

@@ -127,6 +127,7 @@ app.get("/groomers/getallgroomers", groomerController.getAllGroomers);
 app.post("/groomers/toggleduty", groomerController.toggleDuty);
 app.get("/groomers/getondutygroomers", groomerController.getOnDutyGroomers);
 app.post("/groomers/nextpatient", groomerController.nextPatient);
+app.delete('/groomers/:groomerId', groomerController.deleteGroomer);
 
 app.get("/message/sendwa", messageController.sendWa);
 
