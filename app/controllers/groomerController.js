@@ -32,43 +32,36 @@ exports.addGroomer = async function(req, res){
 }
 
 
-
 exports.deleteGroomer = async function(req, res) {
-  let { groomerId } = req.params; // Get doctorId from request parameters
+  let { groomerId } = req.params; // Get groomerId from request parameters
   let result = {
     success: false,
     message: null
   };
 
   try {
-    // Find the doctor by ID
-    let doctor = await Groomer.findByPk(groomerId);
+    // Find the groomer by ID
+    let groomer = await Groomer.findByPk(groomerId);
     
-    if (!groomer) {
+    if (!groomer) {  // Check if the groomer is found
       result.success = false;
       result.message = "Groomer not found.";
-      return res.status(404).send(result); // Respond if doctor doesn't exist
+      return res.status(404).send(result);  // Respond with 404 if groomer doesn't exist
     }
 
     console.log("groomer");
     console.log(groomer);
 
+    // Optionally, you can check and clean up any related data before deleting
+    // (For example, unlinking tickets, etc.)
 
-    /*
-    // Check if the doctor has active tickets
-    if (doctor.Tickets.length > 0) {
-      // Optionally, you can unlink the doctor from any tickets if you don't want to delete the tickets
-      await doctor.removeTickets(doctor.Tickets);
-    }
-    */
-
-    // Delete the doctor from the database
+    // Delete the groomer from the database
     await groomer.destroy();
 
     result.success = true;
-    result.message = "Successfully deleted the doctor.";
-    
-    // Emit a socket event notifying clients that a doctor has been deleted (if needed)
+    result.message = "Successfully deleted the groomer.";
+
+    // Emit a socket event notifying clients that a groomer has been deleted (if needed)
     home.emit("groomerDeleted", { groomerId });
 
   } catch (e) {
@@ -76,7 +69,7 @@ exports.deleteGroomer = async function(req, res) {
     result.message = e.toString();
   }
 
-  res.send(result); // Send the result to the client
+  res.send(result);  // Send the result to the client
 };
 
 exports.toggleDuty = async function(req, res){
