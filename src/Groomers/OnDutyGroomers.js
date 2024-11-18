@@ -3,6 +3,8 @@ import axios from 'axios';
 import { config } from '../Config/config';
 import io from 'socket.io-client';
 import ReactLoading from 'react-loading';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'; // Import volume-up icon
 
 class OnDutyGroomers extends Component {
   constructor() {
@@ -12,6 +14,7 @@ class OnDutyGroomers extends Component {
     this.state = {
       onDutyGroomers: [],
       groomerLoadingStatus: {}, // Track loading state for each groomer
+      error: null, // Track any errors
     };
     this._isMounted = false;  // Track if the component is mounted
   }
@@ -37,7 +40,7 @@ class OnDutyGroomers extends Component {
 
   // Safe async method with mounted check
   async refresh() {
-    this.setState({ groomerLoadingStatus: {} });  // Reset all loading states when fetching data
+    this.setState({ groomerLoadingStatus: {}, error: null });  // Reset all loading states when fetching data
     try {
       const response = await axios.get(`${this.URL}/groomers/getondutygroomers`);
       if (this._isMounted) {
@@ -45,6 +48,9 @@ class OnDutyGroomers extends Component {
       }
     } catch (error) {
       console.error('Error fetching on-duty groomers:', error);
+      if (this._isMounted) {
+        this.setState({ error: 'Failed to fetch groomers.' });  // Set error in state
+      }
     }
   }
 
@@ -84,11 +90,22 @@ class OnDutyGroomers extends Component {
     }
   }
 
+  // Function to announce ticket number using SpeechSynthesis API
+  announceTicketNumber(ticketNumber) {
+    const utterance = new SpeechSynthesisUtterance();
+    utterance.text = `Nomor antrian ${ticketNumber.toString().padStart(4, '0')} Silakan masuk`;
+    utterance.lang = 'id-ID'; // Set language to Indonesian
+    utterance.rate = 1; // Set speech rate (speed)
+    utterance.pitch = 1; // Set speech pitch (tone)
+    speechSynthesis.speak(utterance); // Speak the utterance
+  }
+
   render() {
-    const { onDutyGroomers, groomerLoadingStatus } = this.state;
+    const { onDutyGroomers, groomerLoadingStatus, error } = this.state;
 
     return (
       <div className="row" style={{ marginTop: '20px', marginBottom: '20px', marginLeft: '5px', marginRight: '5px' }}>
+        {error && <div className="alert alert-danger col-12">{error}</div>} {/* Display error if any */}
         {onDutyGroomers.length === 0 ? (
           <div className="col-12 text-center">No on-duty groomers.</div>
         ) : (
@@ -105,13 +122,9 @@ class OnDutyGroomers extends Component {
             >
               <div className="card-body">
                 <h4>{this.getTicket(onDutyGroomer)}</h4>
-                <div className="card-text">
-                  <p>
-                    <strong className="text-danger">Groomer:</strong> {onDutyGroomer.groomerName}
-                  </p>
-                  <p>{this.getPatient(onDutyGroomer)}</p>
-                </div>
-              </div>
+                     <strong className="text-danger">Groomer:</strong> {onDutyGroomer.groomerName}
+                   <p>{this.getPatient(onDutyGroomer)}</p>
+               </div>
 
               <div className="card-footer">
                 {groomerLoadingStatus[onDutyGroomer.groomerId] ? (
@@ -120,13 +133,27 @@ class OnDutyGroomers extends Component {
                     <ReactLoading type="bars" color="#000" height={30} width={30} />
                   </div>
                 ) : (
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => this.nextPatientGroomer(onDutyGroomer.groomerId)}
-                    disabled={groomerLoadingStatus[onDutyGroomer.groomerId]} // Disable button while loading for that specific groomer
-                  >
-                    Next Patient
-                  </button>
+                  <div className="col-12 text-center">
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => this.nextPatientGroomer(onDutyGroomer.groomerId)}
+                      disabled={groomerLoadingStatus[onDutyGroomer.groomerId]} // Disable button while loading for that specific groomer
+                    >
+                      Berikutnya
+                    </button>
+                    
+                    <button 
+                   className="btn btn-sm btn-primary ml-2"  // Icon size and color, with marginTop for positioning
+                     
+                   >
+                   <FontAwesomeIcon
+                        icon={faVolumeUp} // Use FontAwesome icon
+                        style={{ fontSize: '18px', cursor: 'pointer', color: 'white', marginTop: '0px' }} // Icon size and color, with marginTop for positioning
+                        onClick={() => this.announceTicketNumber(this.getTicket(onDutyGroomer))} // Call function to announce ticket
+                      />
+                 </button>
+
+                  </div>
                 )}
               </div>
             </div>

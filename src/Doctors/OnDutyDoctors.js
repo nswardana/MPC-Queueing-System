@@ -3,8 +3,11 @@ import axios from 'axios';
 import { config } from '../Config/config';
 import ReactLoading from 'react-loading';
 
-class OnDutyDoctors extends Component {
+// Import FontAwesome components
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeUp } from '@fortawesome/free-solid-svg-icons'; // Import volume-up icon
 
+class OnDutyDoctors extends Component {
   _isMounted = false; // Flag to track component mounting state
 
   constructor() {
@@ -113,6 +116,16 @@ class OnDutyDoctors extends Component {
     this.props.socket.emit("recall", ticketNumber); // Emit recall event via socket
   }
 
+  // Function to announce ticket number using SpeechSynthesis API
+  announceTicketNumber(ticketNumber) {
+    const utterance = new SpeechSynthesisUtterance();
+    utterance.text = `Nomor antrian ${ticketNumber.toString().padStart(4, '0')} Silakan masuk`;
+    utterance.lang = 'id-ID'; // Set language to Indonesian
+    utterance.rate = 1; // Set speech rate (speed)
+    utterance.pitch = 1; // Set speech pitch (tone)
+    speechSynthesis.speak(utterance); // Speak the utterance
+  }
+
   render() {
     const { onDutyDoctors, loadingDoctors, error } = this.state;
 
@@ -133,22 +146,37 @@ class OnDutyDoctors extends Component {
               </div>
 
               <div className="card-footer">
-              <div className="col-12 text-center">
-               
-                {loadingDoctors[onDutyDoctor.doctorId] ? (
-                  // Show loading indicator only for the specific doctor being processed
-                    <ReactLoading type={"bars"} color={"#000"} height={30} width={30} /> 
-            
-                ) : (
-                  <button 
-                    className="btn btn-sm btn-danger" 
-                    onClick={() => this.nextPatientDoctor(onDutyDoctor.doctorId)} 
-                    disabled={loadingDoctors[onDutyDoctor.doctorId]} // Disable the button when loading
-                  >
-                    Berikutnya
-                  </button>
-                )}
-                      </div>
+                <div className="col-12 text-center">
+                  {loadingDoctors[onDutyDoctor.doctorId] ? (
+                    // Show loading indicator only for the specific doctor being processed
+                    <ReactLoading type={"bars"} color={"#000"} height={30} width={30} />
+                  ) : (
+                    <button 
+                      className="btn btn-sm btn-danger" 
+                      onClick={() => this.nextPatientDoctor(onDutyDoctor.doctorId)} 
+                      disabled={loadingDoctors[onDutyDoctor.doctorId]} // Disable the button when loading
+                    >
+                      Berikutnya
+                    </button>
+                    
+                  )}
+
+                  {/* Add FontAwesome VolumeUpIcon for announcing ticket number */}
+                {onDutyDoctor.ticketNumber && (
+                   <button 
+                   className="btn btn-sm btn-primary"   style={{  marginLeft: '2px' }} // Icon size and color, with marginTop for positioning
+                     
+                   >
+                   <FontAwesomeIcon
+                        icon={faVolumeUp} // Use FontAwesome icon
+                        style={{ fontSize: '18px', cursor: 'pointer', color: 'white', marginTop: '0px' }} // Icon size and color, with marginTop for positioning
+                        onClick={() => this.announceTicketNumber(onDutyDoctor.ticketNumber)} // Call function to announce ticket
+                      />
+                 </button>
+                      
+                  
+                  )}
+                </div>
               </div>
             </div>
           ))
