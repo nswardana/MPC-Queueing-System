@@ -54,11 +54,17 @@ exports.deleteDoctor = async function(req, res) {
       return res.status(404).send(result); // Respond if doctor doesn't exist
     }
 
+    console.log("doctor");
+    console.log(doctor);
+
+
+    /*
     // Check if the doctor has active tickets
     if (doctor.Tickets.length > 0) {
       // Optionally, you can unlink the doctor from any tickets if you don't want to delete the tickets
       await doctor.removeTickets(doctor.Tickets);
     }
+    */
 
     // Delete the doctor from the database
     await doctor.destroy();
