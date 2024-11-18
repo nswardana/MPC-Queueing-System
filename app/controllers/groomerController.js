@@ -31,38 +31,44 @@ exports.addGroomer = async function(req, res){
   res.send(result);
 }
 
+
+
 exports.deleteGroomer = async function(req, res) {
-  let { groomerId } = req.params;  // Extract groomerId from request parameters
+  let { groomerId } = req.params; // Get doctorId from request parameters
   let result = {
     success: false,
     message: null
   };
 
   try {
-    // Find the groomer by ID
-    let groomer = await Groomer.findByPk(groomerId);
+    // Find the doctor by ID
+    let doctor = await Groomer.findByPk(groomerId);
     
     if (!groomer) {
       result.success = false;
       result.message = "Groomer not found.";
-      return res.status(404).send(result);  // Respond if groomer doesn't exist
+      return res.status(404).send(result); // Respond if doctor doesn't exist
     }
 
-      /*
-    // If the groomer has any active tickets, you can either unlink them or delete them
-    if (groomer.Tickets.length > 0) {
-      // Unlink the groomer from the tickets
-      await groomer.removeTickets(groomer.Tickets);
+    console.log("groomer");
+    console.log(groomer);
+
+
+    /*
+    // Check if the doctor has active tickets
+    if (doctor.Tickets.length > 0) {
+      // Optionally, you can unlink the doctor from any tickets if you don't want to delete the tickets
+      await doctor.removeTickets(doctor.Tickets);
     }
     */
 
-    // Delete the groomer
+    // Delete the doctor from the database
     await groomer.destroy();
 
     result.success = true;
-    result.message = "Successfully deleted the groomer.";
-
-    // Emit a socket event to notify clients about the groomer deletion (optional)
+    result.message = "Successfully deleted the doctor.";
+    
+    // Emit a socket event notifying clients that a doctor has been deleted (if needed)
     home.emit("groomerDeleted", { groomerId });
 
   } catch (e) {
@@ -70,9 +76,8 @@ exports.deleteGroomer = async function(req, res) {
     result.message = e.toString();
   }
 
-  res.send(result);  // Send the result back to the client
+  res.send(result); // Send the result to the client
 };
-
 
 exports.toggleDuty = async function(req, res){
 

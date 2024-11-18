@@ -91,7 +91,7 @@ class Groomers extends Component {
     this.setState({ loading: true, error: null, action: 'deleting groomer' });
 
     try {
-      const result = (await axios.delete(`${this.URL}/groomers/delete/${groomerId}`)).data;
+      const result = (await axios.delete(`${this.URL}/groomers/${groomerId}`)).data;
 
       if (result.success) {
         const groomers = this.state.groomers.filter(groomer => groomer.groomerId !== groomerId);
