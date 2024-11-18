@@ -116,14 +116,21 @@ class OnDutyDoctors extends Component {
     this.props.socket.emit("recall", ticketNumber); // Emit recall event via socket
   }
 
-  // Function to announce ticket number using SpeechSynthesis API
+  // Function to announce ticket number using SpeechSynthesis API and play .wav sound
   announceTicketNumber(ticketNumber) {
-    const utterance = new SpeechSynthesisUtterance();
-    utterance.text = `Nomor antrian ${ticketNumber.toString().padStart(4, '0')} Silakan masuk`;
-    utterance.lang = 'id-ID'; // Set language to Indonesian
-    utterance.rate = 1; // Set speech rate (speed)
-    utterance.pitch = 1; // Set speech pitch (tone)
-    speechSynthesis.speak(utterance); // Speak the utterance
+    // Play the "ting tong" sound (WAV file) first
+    const audio = new Audio('/start.wav'); // Ensure the WAV file is placed in the 'public' folder
+    audio.play();
+
+    // After the WAV sound is played, announce the ticket number
+    audio.onended = () => {
+      const utterance = new SpeechSynthesisUtterance();
+      utterance.text = `Nomor antrian ${ticketNumber.toString().padStart(4, '0')} Silakan masuk`;
+      utterance.lang = 'id-ID'; // Set language to Indonesian
+      utterance.rate = 1; // Set speech rate (speed)
+      utterance.pitch = 1; // Set speech pitch (tone)
+      speechSynthesis.speak(utterance); // Speak the utterance
+    };
   }
 
   render() {
@@ -138,7 +145,7 @@ class OnDutyDoctors extends Component {
           onDutyDoctors.map(onDutyDoctor => (
             <div key={onDutyDoctor.doctorId} className="col-sm-3 card text-center text-bg-info" style={{ marginTop: '5px', marginLeft: '5px', padding: '0px', backgroundColor: "rgba(0, 102, 51, 0.3)" }}>
               <div className="card-body">
-                <h5>{this.getTicket(onDutyDoctor)}</h5>
+                <h4>{this.getTicket(onDutyDoctor)}</h4>
                 <div className="card-text">
                   <span><strong className="text-danger">Dokter:</strong> {onDutyDoctor.doctorName}</span>
                   {this.getPatient(onDutyDoctor)}
