@@ -37,6 +37,47 @@ exports.addDoctor = async function(req, res){
   res.send(result);
 }
 
+exports.deleteDoctor = async function(req, res) {
+  let { doctorId } = req.params; // Get doctorId from request parameters
+  let result = {
+    success: false,
+    message: null
+  };
+
+  try {
+    // Find the doctor by ID
+    let doctor = await Doctor.findByPk(doctorId);
+    
+    if (!doctor) {
+      result.success = false;
+      result.message = "Doctor not found.";
+      return res.status(404).send(result); // Respond if doctor doesn't exist
+    }
+
+    // Check if the doctor has active tickets
+    if (doctor.Tickets.length > 0) {
+      // Optionally, you can unlink the doctor from any tickets if you don't want to delete the tickets
+      await doctor.removeTickets(doctor.Tickets);
+    }
+
+    // Delete the doctor from the database
+    await doctor.destroy();
+
+    result.success = true;
+    result.message = "Successfully deleted the doctor.";
+    
+    // Emit a socket event notifying clients that a doctor has been deleted (if needed)
+    home.emit("doctorDeleted", { doctorId });
+
+  } catch (e) {
+    result.success = false;
+    result.message = e.toString();
+  }
+
+  res.send(result); // Send the result to the client
+};
+
+
 exports.toggleDuty = async function(req, res){
 
   let { doctorId } = req.body;

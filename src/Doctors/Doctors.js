@@ -11,9 +11,10 @@ class Doctors extends Component {
   constructor() {
     super();
     this.URL = config.URL;
-   // this.socket = io.connect(this.URL);
     this.state = {
-      doctors: []
+      doctors: [],
+      loading: false,  // To manage loading state
+      error: null,     // To manage error state
     };
   }
 
@@ -23,9 +24,11 @@ class Doctors extends Component {
       await this.refresh();
     } catch (error) {
       console.error("Error during componentDidMount:", error);
+      this.setState({ error: 'Error fetching doctors' });
     }
 
     // Example of setting up a socket listener (uncomment if you need it)
+    // this.socket = io.connect(this.URL);
     // this.socket.on("doctorToggleDuty", (data) => {
     //   this.refresh();
     // });
@@ -35,28 +38,35 @@ class Doctors extends Component {
     this._isMounted = false; // Mark component as unmounted
 
     // Cleanup socket connection when component is unmounted
-    /*
-    if (this.socket) {
-      this.socket.disconnect();
-    }
-    */
+    // if (this.socket) {
+    //   this.socket.disconnect();
+    // }
   }
 
   async refresh() {
+    this.setState({ loading: true });
     try {
       const doctors = (await axios.get(`${this.URL}/doctors/getalldoctors`)).data;
-
-      if (this._isMounted) { // Only update state if the component is still mounted
+      if (this._isMounted) { // Only update state if component is still mounted
         this.setState({
-          doctors
+          doctors,
+          loading: false,
         });
       }
     } catch (error) {
       console.error("Error fetching doctors:", error);
+      if (this._isMounted) {
+        this.setState({
+          loading: false,
+          error: 'Error fetching doctors',
+        });
+      }
     }
   }
 
   toggleDuty = async (doctorId) => {
+    this.setState({ loading: true });
+
     try {
       const result = (await axios.post(`${this.URL}/doctors/toggleduty`, {
         doctorId
@@ -66,15 +76,15 @@ class Doctors extends Component {
         let doctors = [...this.state.doctors];
         for (let i = 0; i < doctors.length; i++) {
           if (doctors[i].doctorId === doctorId) {
-            let toggleStatus = doctors[i].onDuty ? false : true;
-            doctors[i].onDuty = toggleStatus;
+            doctors[i].onDuty = !doctors[i].onDuty;  // Toggle duty status
             break;
           }
         }
 
         if (this._isMounted) { // Only update state if component is still mounted
           this.setState({
-            doctors
+            doctors,
+            loading: false,
           });
         }
 
@@ -83,21 +93,60 @@ class Doctors extends Component {
       }
     } catch (e) {
       console.error("Error toggling doctor duty:", e);
+      this.setState({
+        loading: false,
+        error: 'Error toggling doctor duty',
+      });
+    }
+  };
+
+  deleteDoctor = async (doctorId) => {
+    if (window.confirm('Are you sure you want to delete this doctor?')) {
+      this.setState({ loading: true });
+      try {
+        const result = (await axios.delete(`${this.URL}/doctors/${doctorId}`)).data;
+
+        if (result.success) {
+          let doctors = this.state.doctors.filter(doctor => doctor.doctorId !== doctorId);
+
+          if (this._isMounted) {
+            this.setState({
+              doctors,
+              loading: false,
+            });
+          }
+
+          // Emit socket event if needed
+          // this.socket.emit("doctorDeleted", { doctorId });
+        }
+      } catch (e) {
+        console.error("Error deleting doctor:", e);
+        this.setState({
+          loading: false,
+          error: 'Error deleting doctor',
+        });
+      }
     }
   };
 
   render() {
+    const { doctors, loading, error } = this.state;
+
     return (
       <React.Fragment>
         <div className="container">
+          {loading && <div className="text-center"><p>Loading...</p></div>}
+          {error && <div className="alert alert-danger">{error}</div>}
+
           <div className="row">
             <div className="col-4 card">
               <NewDoctor refresh={() => this.refresh()} />
             </div>
             <div className="col-8 card">
               <AllDoctors
-                doctors={this.state.doctors}
+                doctors={doctors}
                 toggleDuty={this.toggleDuty}
+                deleteDoctor={this.deleteDoctor}  // Pass deleteDoctor function
                 refresh={() => this.refresh()}
               />
             </div>

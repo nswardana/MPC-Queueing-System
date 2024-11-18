@@ -119,6 +119,7 @@ app.get("/doctors/getalldoctors", doctorController.getAllDoctors);
 app.post("/doctors/toggleduty", doctorController.toggleDuty);
 app.get("/doctors/getondutydoctors", doctorController.getOnDutyDoctors);
 app.post("/doctors/nextpatient", doctorController.nextPatient);
+app.delete('/doctors/:doctorId', doctorController.deleteDoctor);
 
 
 app.post("/groomers/addgroomer", groomerController.addGroomer);
