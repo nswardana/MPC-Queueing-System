@@ -1,0 +1,13 @@
+/* src/Queue/Queue.css */
+
+/* Hide QueueControl on small screens */
+.queue-control {
+  display: block;
+}
+
+/* Media query to hide QueueControl on mobile screens */
+@media (max-width: 767px) {
+  .queue-control {
+    display: none;
+  }
+}

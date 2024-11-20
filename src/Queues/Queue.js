@@ -1,3 +1,4 @@
+// src/Queue/Queue.jsx
 import React, { Component } from 'react';
 import QueueTickets from './QueueTickets';
 import QueueControl from './QueueControl';
@@ -84,7 +85,8 @@ class Queue extends Component {
       <React.Fragment>
         <div className="container">
           <div className="row">
-            <div className="col-2 card">
+            {/* QueueControl - Only takes up 2 columns on larger screens */}
+            <div className="col-12 col-md-2 card">
               <div className="container">
                 <div className="row">
                   <QueueControl
@@ -96,7 +98,9 @@ class Queue extends Component {
                 </div>
               </div>
             </div>
-            <div className="col-10 card" style={{ marginLeft: '0px' }}>
+
+            {/* Main content section */}
+            <div className="col-12 col-md-10 card" style={{ marginLeft: '0px' }}>
               <OnDutyDoctors socket={this.socket} refreshTickets={() => this.refreshTickets()} />
               <OnDutyGroomers socket={this.socket} refreshTickets={() => this.refreshTickets()} />
             </div>
