@@ -1,28 +1,25 @@
-import React, { Component } from 'react';
+import React, { useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import './QueueTicket.css';
 
-class PrintAntrian extends Component {
-  constructor(props) {
-    super(props);
-    this.queueNumber = this.props.location.state.data.ticketNumber; // Queue number from props
-    this.layanan = this.props.location.state.data.layanan; // Service type from props
-    this.ticketRef = React.createRef(); // Reference for the print area
+const PrintAntrian = () => {
+  // Access the location state using the useLocation hook
+  const location = useLocation();
+  const ticketData = location.state && location.state.data;  // Safely accessing the passed data from navigate
+  const queueNumber = ticketData && ticketData.ticketNumber && ticketData.ticketNumber.toString().padStart(4, '0');  // Queue number from state
+  const layanan = ticketData && ticketData.layanan;  // Service type from state
 
-    console.log(this.props.location.state.data); // Logging for debugging
-  }
+  const ticketRef = useRef(); // Reference for the print area
 
   // Function to get formatted date and time
-  getFormattedDateTime = () => {
+  const getFormattedDateTime = () => {
     const now = new Date();
-    
-    // Format the date as day, month (name), and year
     const formattedDate = now.toLocaleDateString('en-GB', {
-      day: '2-digit',   // Two-digit day (e.g., 20)
-      month: 'long',    // Full month name (e.g., November)
-      year: 'numeric',  // Full year (e.g., 2024)
+      day: '2-digit',   
+      month: 'long',    
+      year: 'numeric',  
     });
 
-    // Format the time as HH:mm
     const formattedTime = now.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
@@ -32,36 +29,35 @@ class PrintAntrian extends Component {
   };
 
   // Layout for the print ticket
-  layout() {
+  const layout = () => {
     return (
-      <div className="queue-ticket" ref={this.ticketRef}>
+      <div className="queue-ticket" ref={ticketRef}>
         <div className="ticket-header">
           <h4>ARMONIA PET CARE</h4>
           <h4>0878-4196-4088</h4>
         </div>
         <div className="ticket-body">
           <div className="queue-number">
-            <div>Antrian {this.layanan}</div>
-            <div className="date">{this.getFormattedDateTime()}</div>
+            <div>Antrian {layanan}</div>
+            <div className="date">{getFormattedDateTime()}</div>
             <p id="queue-number">
-              #{this.queueNumber < 10 ? `00${this.queueNumber}` : this.queueNumber}
+              #{queueNumber < 10 ? `00${queueNumber}` : queueNumber}
             </p>
           </div>
           <p className="queue-keterangan">Hubungi staff kami apabila dalam keadaan gawat darurat</p>
           <p className="queue-keterangan">Nomor Antrian disimpan di loket apotik</p>
-
         </div>
         <div className="ticket-footer">
           <p>Terima Kasih</p>
         </div>      
       </div>
     );
-  }
+  };
 
   // Function to handle the print with CSS styles
-  handlePrint = () => {
+  const handlePrint = () => {
     const printWindow = window.open('', '', 'width=800,height=600'); // Open a new window for printing
-    const content = this.ticketRef.current.innerHTML; // Get the content to print
+    const content = ticketRef.current.innerHTML; // Get the content to print
 
     // Write content and apply styles
     printWindow.document.write('<html><head><title>Print Ticket</title>');
@@ -136,20 +132,18 @@ class PrintAntrian extends Component {
     printWindow.print(); // Trigger the print dialog
   };
 
-  render() {
-    return (
-      <React.Fragment>
-        {/* Print Button */}
-        <div className="content">
-          {this.layout()} {/* Render the ticket layout */}
-          <br />
-          <button type="button" className="btn btn-danger" onClick={this.handlePrint}>
-            Print Ticket
-          </button>
-        </div>
-      </React.Fragment>
-    );
-  }
-}
+  return (
+    <React.Fragment>
+      {/* Print Button */}
+      <div className="content">
+        {layout()} {/* Render the ticket layout */}
+        <br />
+        <button type="button" className="btn btn-danger" onClick={handlePrint}>
+          Print Ticket
+        </button>
+      </div>
+    </React.Fragment>
+  );
+};
 
 export default PrintAntrian;

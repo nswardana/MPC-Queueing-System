@@ -20,8 +20,18 @@ class SearchPatient extends Component{
 
 		};
 		this.state = this.initialState;
+		 // Create a ref to the input field
+		 this.inputRef = React.createRef();
        
 	}
+	 // Focus the input element after the component mounts
+	 componentDidMount() {
+		if (this.inputRef.current) {
+		  this.inputRef.current.focus(); // Set focus to the input field
+		}
+	  }
+	
+
 	updateNohp(value){
 		this.setState({
 			no_hp: value
@@ -81,7 +91,7 @@ class SearchPatient extends Component{
 						}
 					</div>
                     <div className="form-group custom-search">
-                        <input type="text" className="form-control custom-search-input" placeholder="Masukan no hp atau nama" onBlur={(e) => this.updateNohp(e.target.value)} onChange={(e) => this.updateNohp(e.target.value)}
+                        <input type="text" className="form-control custom-search-input" ref={this.inputRef} placeholder="Masukan no hp atau nama" onBlur={(e) => this.updateNohp(e.target.value)} onChange={(e) => this.updateNohp(e.target.value)}
 							value={this.state.no_hp}  onKeyPress={event => {
 								if (event.key === 'Enter') {
 									this.submit()
