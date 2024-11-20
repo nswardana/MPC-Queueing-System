@@ -48,6 +48,8 @@ class PrintAntrian extends Component {
             </p>
           </div>
           <p className="queue-keterangan">Hubungi staff kami apabila dalam keadaan gawat darurat</p>
+          <p className="queue-keterangan">Nomor Antrian disimpan di loket apotik</p>
+
         </div>
         <div className="ticket-footer">
           <p>Terima Kasih</p>
