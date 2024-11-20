@@ -1,9 +1,9 @@
-import React, { Component } from 'react';
-import { Route, Routes } from 'react-router-dom';
+// src/App.jsx
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import NavBar from './NavBar/NavBar';
 import Home from './Home/Home';
-import Registration from './Registration/Registration';
-import RegistrationWrapper from './Registration/RegistrationWrapper';  // Import the wrapper component
+import RegistrationWrapper from './Registration/RegistrationWrapper';
 import Layanan from './Registration/Layanan';
 import PrintAntrian from './Registration/PrintAntrian';
 import Doctors from './Doctors/Doctors';
@@ -11,27 +11,52 @@ import Groomers from './Groomers/Groomers';
 import Queue from './Queues/Queue';
 import Inactiveickets from './Report/InactiveTickets';
 import ModalExample from './Home/ModalExample';
+import Login from './Login/Login';  // Import the Login component
+import ProtectedRoute from './ProtectedRoute';  // Import the ProtectedRoute
 
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <NavBar />
-        {/* Define the Routes using the new 'element' prop */}
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/registration" element={<RegistrationWrapper />} />
-          <Route path="/registration/layanan" element={<Layanan />} />
-          <Route path="/registration/print" element={<PrintAntrian />} />
-          <Route path="/queue" element={<Queue />} />
-          <Route path="/doctors" element={<Doctors />} />
-          <Route path="/groomers" element={<Groomers />} />
-          <Route path="/report" element={<Inactiveickets />} />
+const App = () => {
+  return (
+    <div>
+      <NavBar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/registration" element={<RegistrationWrapper />} />
+        <Route path="/registration/layanan" element={<Layanan />} />
+        <Route path="/registration/print" element={<PrintAntrian />} />
+        
+        {/* Protected Routes */}
+        <Route 
+          path="/queue" 
+          element={
+            <ProtectedRoute>
+              <Queue />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="/doctors" 
+          element={
+            <ProtectedRoute>
+              <Doctors />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/groomers"  element={
+            <ProtectedRoute>
+              <Groomers />
+            </ProtectedRoute>
+          }/>
+          <Route path="/report"  element={
+            <ProtectedRoute>
+              <Inactiveickets />
+            </ProtectedRoute>
+          }/>   
+        {/* Non-protected Routes */}
           <Route path="/test" element={<ModalExample />} />
-        </Routes>
-      </div>
-    );
-  }
-}
+      </Routes>
+    </div>
+  );
+};
 
 export default App;

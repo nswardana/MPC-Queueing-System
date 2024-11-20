@@ -23,6 +23,11 @@ const Home = () => {
   // Method to handle icon click actions
   const handleClick = (action) => {
     navigate(action); // Use navigate function from useNavigate hook
+    if(action==="/logout")
+    {
+      localStorage.removeItem('isAuthenticated');
+      window.location.href = '/login'; // Redirect to login after logout
+    }
   };
 
   return (
