@@ -6,19 +6,32 @@ import FormRegistration from './FormRegistration';
 const Layanan = () => {
   const location = useLocation(); // Use useLocation hook to access location state
 
-  // Log the passed patient data
+  // Check if location.state is present and handle cases where it's missing
+  const patient = location.state || null;
+
+  // Log the passed patient data (optional for debugging)
   console.log("Layanan");
-  console.log(location.state);
+  console.log(patient);
+
+  if (!patient) {
+    return (
+      <div className="container">
+        <h3>No patient data available</h3>
+      </div>
+    );
+  }
 
   return (
     <React.Fragment>
       <div className="container">
         <div className="row">
-          <div className="col-4 card">
-            <DataPatient patient={location.state} />
+          {/* DataPatient Component */}
+          <div className="col-12 col-md-4 card mb-3">
+            <DataPatient patient={patient} />
           </div>
-          <div className="col-8 card">
-            <FormRegistration patient={location.state} />
+          {/* FormRegistration Component */}
+          <div className="col-12 col-md-8 card mb-3">
+            <FormRegistration patient={patient} />
           </div>
         </div>
       </div>
