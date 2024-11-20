@@ -142,7 +142,7 @@ exports.getOnDutyDoctors = async function(req, res){
       where: {
         isActive: true
       },
-      attributes: ['id', 'ticketNumber'],
+      attributes: ['id', 'ticketNumber','layanan'],
       required: false,
       include: [{
         model: Queue,
@@ -167,6 +167,7 @@ exports.getOnDutyDoctors = async function(req, res){
     doctorName: doctor.name,
     ticketId: doctor.Tickets.length > 0 ? doctor.Tickets[0].id : null,
     ticketNumber: doctor.Tickets.length > 0 ? doctor.Tickets[0].ticketNumber : null,
+    layanan: doctor.Tickets.length > 0 ? doctor.Tickets[0].layanan : null,
     patientFirstName: doctor.Tickets.length > 0 ? doctor.Tickets[0].patient.name: null,
     patientLastName: doctor.Tickets.length > 0 ? doctor.Tickets[0].patient.name: null
   }));

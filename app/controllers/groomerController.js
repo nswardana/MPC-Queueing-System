@@ -130,7 +130,7 @@ exports.getOnDutyGroomers = async function(req, res){
       where: {
         isActive: true
       },
-      attributes: ['id', 'ticketNumber'],
+      attributes: ['id', 'ticketNumber','layanan'],
       required: false,
       include: [{
         model: Queue,
@@ -155,6 +155,7 @@ exports.getOnDutyGroomers = async function(req, res){
     groomerName: groomer.name,
     ticketId: groomer.Tickets.length > 0 ? groomer.Tickets[0].id : null,
     ticketNumber: groomer.Tickets.length > 0 ? groomer.Tickets[0].ticketNumber : null,
+    layanan: groomer.Tickets.length > 0 ? groomer.Tickets[0].layanan : null,
     patientFirstName: groomer.Tickets.length > 0 ? groomer.Tickets[0].patient.name: null,
     patientLastName: groomer.Tickets.length > 0 ? groomer.Tickets[0].patient.name: null
   }));

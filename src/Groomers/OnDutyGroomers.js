@@ -95,7 +95,7 @@ class OnDutyGroomers extends Component {
   }
 
   // Function to announce ticket number using SpeechSynthesis API and play .wav sound
-  announceTicketNumber(ticketNumber) {
+  announceTicketNumber(ticketNumber,layanan) {
     // Play the "ting tong" sound (WAV file) first
     const audio = new Audio('/start.wav'); // Ensure the WAV file is placed in the 'public' folder
     audio.play();
@@ -103,7 +103,7 @@ class OnDutyGroomers extends Component {
     // After the WAV sound is played, announce the ticket number
     audio.onended = () => {
       const utterance = new SpeechSynthesisUtterance();
-      utterance.text = `Nomor antrian ${ticketNumber.toString().padStart(4, '0')} Silakan masuk`;
+      utterance.text = `Nomor antrian ${ticketNumber.toString().padStart(4, '0')} ${layanan} Silakan masuk`;
       utterance.lang = 'id-ID'; // Set language to Indonesian
       utterance.rate = 1; // Set speech rate (speed)
       utterance.pitch = 1; // Set speech pitch (tone)
@@ -159,7 +159,7 @@ class OnDutyGroomers extends Component {
                       <FontAwesomeIcon
                         icon={faVolumeUp} // Use FontAwesome icon
                         style={{ fontSize: '18px', cursor: 'pointer', color: 'white', marginTop: '0px' }} // Icon size and color, with marginTop for positioning
-                        onClick={() => this.announceTicketNumber(onDutyGroomer.ticketNumber)} // Call function to announce ticket
+                        onClick={() => this.announceTicketNumber(onDutyGroomer.ticketNumber,onDutyGroomer.layanan)} // Call function to announce ticket
                       />
                     </button>
                      )}
