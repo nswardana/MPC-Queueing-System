@@ -12,6 +12,9 @@ exports.sendWa = async function(req, res){
           issent: false,
         },
         order: [["id", "desc"]],
+        limit: 1, // Fetch only 10 messages
+        offset: 0, // Starting point (use for pagination)
+
       });
 
       console.log("message");
