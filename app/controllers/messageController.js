@@ -4,7 +4,8 @@ const CONFIG = require(__dirname + '/../config/config.json');
 const axios = require('axios');
 const Message = db.Message;
 exports.sendWa = async function(req, res){
-  
+        console.log("sendWa");
+
       let result = { success: false, message: null, data: {} };
       let message = await Message.findAll({
         attributes: ["id", "no_hp", "message", "issent"],
